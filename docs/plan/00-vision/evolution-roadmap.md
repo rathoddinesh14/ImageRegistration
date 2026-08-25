@@ -17,6 +17,12 @@
 - Group-wise / longitudinal registration
 - Optional 4D motion models
 
-## Phase 4 — Optional Unification (only if clearly beneficial)
+## Phase 4 — Learning-based / Deep Learning Methods (optional)
+- Explore hybrid and pure learning-based registration
+- Keep DL frameworks as optional dependencies only
+- Allow learned models to plug into existing `Transform2D` / `Metric2D` interfaces where sensible
+- See backlog: `02-backlog/learning-based/`
+
+## Phase 5 — Optional Unification (only if clearly beneficial)
 - Light shared concepts or templates
 - Optional bridges to ITK/OpenCV/VTK (kept outside core)
