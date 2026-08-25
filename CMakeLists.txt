@@ -12,8 +12,25 @@ else()
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# Find Eigen3
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+# Eigen3 — prefer system package, fall back to FetchContent (useful for CI)
+find_package(Eigen3 3.3 QUIET NO_MODULE)
+if(NOT Eigen3_FOUND)
+  include(FetchContent)
+  FetchContent_Declare(
+    Eigen
+    GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+    GIT_TAG        3.4.0
+    GIT_SHALLOW    TRUE
+  )
+  set(EIGEN_BUILD_DOC OFF CACHE BOOL "" FORCE)
+  set(EIGEN_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+  set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(Eigen)
+  # Eigen 3.4 via FetchContent provides Eigen3::Eigen target
+  if(NOT TARGET Eigen3::Eigen)
+    add_library(Eigen3::Eigen ALIAS eigen)
+  endif()
+endif()
 
 # Main library target
 add_library(ImageRegistration INTERFACE)
