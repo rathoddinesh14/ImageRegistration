@@ -1,39 +1,25 @@
 # Task: Quality Phase 1 — Foundation (Essential)
 
-**Status**: todo  
+**Status**: done (branch `feature/quality-phase1-finish`)  
 **Component**: infrastructure  
-**Priority**: High (do early)
+**Priority**: High
 
 ## Goal
 Establish the minimum quality gate that every change must pass.
 
 ## Items in this phase
 
-1. **Catch2 testing infrastructure**  
-   (see `02-catch2-testing.md`)
-
-2. **GitHub Actions CI (Windows-first)**  
-   (see `01-github-actions-ci.md`)
-   - Runner: `windows-latest`
-   - Build + run tests
-   - Stay within GitHub Free tier
-
-3. **Warnings as errors**
-   - MSVC: `/WX`
-   - (Future GCC/Clang jobs: `-Werror`)
-   - Treat common warning levels as hard failures
-
-4. **Basic clang-format**
-   - Add `.clang-format` to the repository
-   - CI job (or step) that runs `clang-format --dry-run --Werror` (or equivalent on Windows)
-   - Fail the build if formatting differs
+1. **Catch2 testing infrastructure** — done  
+2. **GitHub Actions CI (Windows-first)** — done  
+3. **Warnings as errors** — done (`/WX` on MSVC, `-Werror` on GCC/Clang)  
+4. **Basic clang-format** — done (`.clang-format` + CI job on Ubuntu)
 
 ## Acceptance criteria
-- [ ] Catch2 integrated and a sample test passes on Windows
-- [ ] GitHub Actions workflow runs on `windows-latest` and fails on test failure
-- [ ] Compiler warnings are treated as errors in CI
-- [ ] `.clang-format` exists and format check is part of CI
-- [ ] Documented in `01-implemented/` once complete
+- [x] Catch2 integrated and a sample test passes on Windows
+- [x] GitHub Actions workflow runs on `windows-latest` and fails on test failure
+- [x] Compiler warnings are treated as errors in CI
+- [x] `.clang-format` exists and format check is part of CI
+- [x] Documented in `01-implemented/`
 
 ## Notes
-This phase gives immediate protection against broken builds, untested code, and basic style drift. It is the highest-priority quality work.
+Quality Phase 1 is complete. Next quality work is Phase 2 (clang-tidy, doc checks, PR template).
