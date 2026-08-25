@@ -1,42 +1,19 @@
 # Task: Coding Standards, Documentation & Modern C++ Practices
 
-**Status**: todo  
+**Status**: done (branch `feature/coding-standards`)  
 **Component**: infrastructure  
 **Priority**: High
 
 ## Goal
-Define the coding standards, documentation conventions, and modern C++ practices that all source code must follow. These standards are enforced progressively through the three quality phases below.
+Define the coding standards, documentation conventions, and modern C++ practices that all source code must follow.
 
-## Scope
-
-### Documentation
-- Public headers use Doxygen-style comments (`///` or `/** */`)
-- Every public function/method documents:
-  - Purpose
-  - Parameters (meaning, units, constraints)
-  - Return value
-  - Pre-/post-conditions and error behavior where relevant
-- Class-level documentation of responsibility and ownership
-
-### Modern C++ (C++20)
-- `[[nodiscard]]` where appropriate
-- Strong const-correctness
-- `noexcept` where correct
-- `enum class`, `override`/`final`
-- Prefer value semantics / smart pointers over raw owning pointers
-- Clear, small functions; no magic numbers
-
-### Production habits
-- Explicit error-handling strategy (to be decided: exceptions vs `std::expected`/error codes)
-- Assertions for internal invariants (debug builds)
-- Clear ownership and lifetime rules at interfaces
-
-## Deliverables
-- Coding standards document (under `docs/` or `docs/plan/`)
-- Supporting ADR
-- Short examples of well-documented headers
-- PR checklist items
+## Deliverables (completed)
+- [x] `docs/coding-standards.md` — full standards guide
+- [x] ADR 006 — official adoption of the standards
+- [x] Example documentation style embedded in the standards doc
+- [x] `.github/PULL_REQUEST_TEMPLATE.md` — PR checklist
 
 ## Related
-- Phase 1–3 quality enforcement tasks
-- Existing ADR 003 (naming conventions)
+- ADR 003 (naming conventions)
+- Quality Phase 1 (format + warnings) — already enforcing part of this
+- Quality Phase 2 — will add clang-tidy and stronger doc checks later
