@@ -34,6 +34,18 @@ target_link_libraries(ImageRegistration
 option(IR_BUILD_TESTS "Build unit tests" OFF)
 if(IR_BUILD_TESTS)
   enable_testing()
+
+  include(FetchContent)
+  FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG        v3.5.2
+  )
+  FetchContent_MakeAvailable(Catch2)
+
+  # Make Catch2 module path available for catch_discover_tests
+  list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
+
   add_subdirectory(tests)
 endif()
 
