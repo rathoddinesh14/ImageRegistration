@@ -22,18 +22,14 @@ Catch deeper code-quality and documentation problems automatically.
    - Fail CI (or warn) when public API lacks docs
    - Can be a simple Python/PowerShell script or Doxygen-based check
 
-3. **PR template / checklist**
-   - Add `.github/PULL_REQUEST_TEMPLATE.md` with quality checklist:
-     - Public API documented
-     - Tests added/updated
-     - Follows coding standards
-     - CI green
+3. **PR template / checklist** — **done** (delivered with coding-standards task)
+   - `.github/PULL_REQUEST_TEMPLATE.md` exists with quality checklist
 
 ## Acceptance criteria
 - [ ] `.clang-tidy` present and running in CI
 - [ ] Basic public-API documentation check exists
-- [ ] PR template with quality checklist
-- [ ] Phase 1 still fully green
+- [x] PR template with quality checklist
+- [x] Phase 1 still fully green
 
 ## Notes
 Phase 2 builds on the solid foundation of Phase 1. It starts enforcing the documentation and modern-C++ rules defined in the coding-standards task.
