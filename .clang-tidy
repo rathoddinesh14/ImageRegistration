@@ -1,0 +1,31 @@
+# Pragmatic clang-tidy config for ImageRegistration (Quality Phase 2)
+# Start narrow; tighten over time as real code grows.
+
+Checks: >
+  -*,
+  bugprone-*,
+  clang-analyzer-*,
+  misc-*,
+  modernize-use-override,
+  modernize-use-nullptr,
+  modernize-use-using,
+  modernize-use-equals-default,
+  modernize-use-equals-delete,
+  modernize-avoid-c-arrays,
+  performance-*,
+  readability-const-return-type,
+  readability-container-size-empty,
+  readability-delete-null-pointer,
+  readability-inconsistent-declaration-parameter-name,
+  readability-make-member-function-const,
+  readability-redundant-*,
+  -bugprone-easily-swappable-parameters,
+  -misc-non-private-member-variables-in-classes,
+  -misc-include-cleaner,
+  -modernize-use-trailing-return-type,
+  -performance-avoid-endl
+
+WarningsAsErrors: ''
+HeaderFilterRegex: 'include/ir/.*'
+FormatStyle: file
+InheritParentConfig: false

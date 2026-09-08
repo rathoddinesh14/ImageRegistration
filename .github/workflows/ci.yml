@@ -41,3 +41,49 @@ jobs:
           clang-format-version: "17"
           check-path: "."
           exclude-regex: "build|_deps|third_party"
+
+  clang-tidy:
+    name: clang-tidy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install clang-tidy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-tidy-17 cmake ninja-build
+
+      - name: Configure with compile_commands
+        run: |
+          cmake -S . -B build-tidy \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -DIR_BUILD_TESTS=ON
+
+      - name: Build (generate artifacts for tidy)
+        run: cmake --build build-tidy
+
+      - name: Run clang-tidy on tests
+        run: |
+          # Interface library has no TUs; analyze test translation units.
+          # Headers under include/ir are covered via HeaderFilterRegex when included.
+          if [ -f build-tidy/compile_commands.json ]; then
+            clang-tidy-17 -p build-tidy tests/test_smoke.cpp --quiet
+          else
+            echo "compile_commands.json missing" >&2
+            exit 1
+          fi
+
+  doc-check:
+    name: public-API docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check public header documentation presence
+        run: python3 scripts/check_public_api_docs.py
