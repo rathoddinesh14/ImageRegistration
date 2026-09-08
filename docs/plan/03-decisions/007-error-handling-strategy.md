@@ -1,7 +1,7 @@
 # ADR 007 — Error handling strategy (hybrid)
 
 **Status**: Proposed  
-**Date**: 2026-08-29
+**Date**: 2026-08-29 (updated 2026-09-08)
 
 ## Decision
 ImageRegistration adopts a **hybrid** error-handling strategy:

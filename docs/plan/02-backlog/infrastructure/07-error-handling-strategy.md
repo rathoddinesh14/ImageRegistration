@@ -33,5 +33,13 @@ Additional rules:
 
 ## Related
 - `08-ir-expected.md` — C++20 expected type
-- `09-registration-result-type.md` — result/summary for registration runs
+- `09-error-types.md` — ErrorCode / Error
+- `../registration/01-registration-result.md` — result/summary for registration runs
 - ADR 006 (coding standards)
+- ADR 007 (Proposed) — accept after review on main
+
+## After this PR merges
+1. Review ADR 007 text on `main`
+2. Change ADR status from **Proposed** → **Accepted** (or revise)
+3. Update `docs/coding-standards.md` §6 to match
+4. Schedule `08` / `09` implementation or proceed to `Point2D` with interim policy
