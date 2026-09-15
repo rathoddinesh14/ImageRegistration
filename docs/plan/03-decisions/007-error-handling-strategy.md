@@ -1,7 +1,7 @@
 # ADR 007 — Error handling strategy (hybrid)
 
-**Status**: Proposed  
-**Date**: 2026-08-29 (updated 2026-09-08)
+**Status**: Accepted  
+**Date**: 2026-08-29 (accepted 2026-09-16)
 
 ## Decision
 ImageRegistration adopts a **hybrid** error-handling strategy:
@@ -23,7 +23,16 @@ ImageRegistration adopts a **hybrid** error-handling strategy:
 5. **Ergonomics**  
    Where useful, provide both:
    - `tryX()` → `Expected` / status (noexcept where possible)
-   - `x()` → value or throw  
+   - `x()` → value or throw
+
+## Decision table (for contributors)
+
+| Question | Mechanism |
+|----------|-----------|
+| Broken contract if the program is correct? | Assert (debug) + document precondition |
+| Can valid callers hit this with hard real data? | `ir::Expected` or result/summary type |
+| Extremely rare or only at app/IO boundary? | Exception + `@throws` |
+| Need success flag + diagnostics together (e.g. optimize)? | Summary struct (e.g. `RegistrationResult`) |
 
 ## Rationale
 - Registration and optimization **fail often** in real data; exceptions-only is noisy in inner pipelines.
@@ -32,15 +41,12 @@ ImageRegistration adopts a **hybrid** error-handling strategy:
 - Assertions catch misuse early without cluttering release call sites.
 
 ## Consequences
-- Coding standards section on error handling must be updated when this ADR is **Accepted**.
+- `docs/coding-standards.md` §6 follows this ADR (no longer interim).
 - Core fallible math APIs should not rely on exceptions as the primary path.
-- Contributors follow the decision table in the coding standards / this ADR.
-- Implementation work is tracked in backlog tasks `07`–`09` under infrastructure and registration.
+- Contributors follow the decision table above.
+- Implementation of `Error` / `ir::Expected` / `RegistrationResult` remains backlog tasks `08`, `09`, and registration result.
 
 ## Alternatives considered
 - **Exceptions only** — simpler call sites; poor fit for optimizer loops and FFI.
 - **Expected only** — consistent but verbose; still need asserts for true bugs.
 - **Error codes only (out-params)** — outdated for new C++ public API.
-
-## Status note
-This ADR is **Proposed** until the project owner explicitly accepts it. Implementation of `ir::Expected` and error types remains backlog until acceptance.

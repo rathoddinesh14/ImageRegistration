@@ -1,8 +1,9 @@
 # Coding Standards — ImageRegistration
 
 This document defines how we write and document C++ code in this library.
-It complements [ADR 003 (naming conventions)](plan/03-decisions/003-coding-conventions.md)
-and [ADR 006 (coding standards adoption)](plan/03-decisions/006-coding-standards.md).
+It complements [ADR 003 (naming conventions)](plan/03-decisions/003-coding-conventions.md),
+[ADR 006 (coding standards adoption)](plan/03-decisions/006-coding-standards.md),
+and [ADR 007 (error handling)](plan/03-decisions/007-error-handling-strategy.md).
 
 ## 1. General principles
 
@@ -85,16 +86,22 @@ private:
 - Avoid magic numbers; use named constants.
 - Keep functions small and focused.
 
-## 6. Error handling (interim)
+## 6. Error handling (ADR 007)
 
-Until a dedicated ADR decides otherwise:
+Hybrid policy — see [ADR 007](plan/03-decisions/007-error-handling-strategy.md).
 
-- Prefer **exceptions** for genuine error conditions in library code that cannot be handled locally.
-- Use assertions (`assert` / similar) for internal programming errors in debug builds.
-- Document what public functions may throw.
-- Do not use exceptions for normal control flow.
+| Kind of failure | Mechanism | Examples |
+|-----------------|-----------|----------|
+| Precondition / internal bug | `assert` in debug; document precondition | Forbidden sizes, API contract misuse |
+| Recoverable operational failure | `ir::Expected<T, E>` and/or result summaries | Singular transform, empty overlap, non-finite metric, non-convergence |
+| Rare / boundary failure | C++ exceptions; document `@throws` | OOM, optional I/O bridges |
 
-(A future ADR may adopt `std::expected` or error codes for specific subsystems.)
+Additional rules:
+
+- Do **not** use exceptions for normal control flow (including optimizer non-convergence).
+- Prefer `[[nodiscard]]` on functions that return `Expected`, status, or summaries.
+- Where useful, offer both `tryX()` (result/`Expected`, `noexcept` when possible) and `x()` (value or throw).
+- `Registration2D::run` (and similar) should return a summary/result object, not throw on non-convergence.
 
 ## 7. Ownership and lifetime
 
