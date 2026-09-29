@@ -16,7 +16,8 @@ public:
     /// Construct a point from Cartesian coordinates.
     /// @param x Horizontal coordinate.
     /// @param y Vertical coordinate.
-    Point2D(double x, double y) noexcept : m_x(x), m_y(y) {}
+    Point2D(double x, double y) noexcept
+        : m_x(x), m_y(y) {}
 
     /// @return The x-coordinate.
     [[nodiscard]] double x() const noexcept { return m_x; }
