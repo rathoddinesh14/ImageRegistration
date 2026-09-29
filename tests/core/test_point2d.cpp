@@ -1,5 +1,4 @@
 #include <ir/core/Point2D.hpp>
-
 #include <type_traits>
 
 #include <catch2/catch_test_macros.hpp>
