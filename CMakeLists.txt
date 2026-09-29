@@ -7,7 +7,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Common warnings — treat as errors (Quality Phase 1)
 if(MSVC)
-  add_compile_options(/W4 /WX)
+  # /external:* silences warnings from angle-bracket third-party headers (e.g. Eigen
+  # C5054 on newer MSVC) so /WX applies to our code only.
+  add_compile_options(/W4 /WX /external:anglebrackets /external:W0)
 else()
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
