@@ -87,3 +87,37 @@ jobs:
 
       - name: Check public header documentation presence
         run: python3 scripts/check_public_api_docs.py
+
+  png-samples:
+    name: PNG sample artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure (CMake)
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DIR_BUILD_TESTS=ON
+
+      - name: Build tests
+        run: cmake --build build --config Release --parallel
+
+      - name: Generate sample PNGs
+        env:
+          IR_PNG_SAMPLE_DIR: ${{ runner.temp }}/io_png_samples
+        run: |
+          mkdir -p "$IR_PNG_SAMPLE_DIR"
+          ctest --test-dir build -C Release -R "sample artifacts" --output-on-failure
+          ls -la "$IR_PNG_SAMPLE_DIR"
+
+      - name: Upload PNG samples
+        uses: actions/upload-artifact@v4
+        with:
+          name: io-png-samples
+          path: ${{ runner.temp }}/io_png_samples/
+          if-no-files-found: error
+          retention-days: 7
+

@@ -49,8 +49,35 @@ target_link_libraries(ImageRegistration
     Eigen3::Eigen
 )
 
+
+# Optional IO library (PNG export via stb_image_write; not linked into core)
+option(IR_BUILD_IO "Build optional IO library (PNG write)" OFF)
+
 # Optional tests
 option(IR_BUILD_TESTS "Build unit tests" OFF)
+if(IR_BUILD_TESTS)
+  set(IR_BUILD_IO ON)
+endif()
+
+if(IR_BUILD_IO)
+  add_library(ir_io STATIC src/io/PngWriter.cpp)
+  add_library(ir::io ALIAS ir_io)
+  target_include_directories(ir_io
+    PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+      $<INSTALL_INTERFACE:include>
+    PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/third_party/stb
+  )
+  target_link_libraries(ir_io PUBLIC ir::ImageRegistration)
+  # stb_image_write is third-party; keep project -Werror without failing on stb
+  if(MSVC)
+    target_compile_options(ir_io PRIVATE /W0)
+  else()
+    target_compile_options(ir_io PRIVATE -Wno-missing-field-initializers -Wno-unused-function)
+  endif()
+endif()
+
 if(IR_BUILD_TESTS)
   enable_testing()
 
