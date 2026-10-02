@@ -34,7 +34,10 @@ and [ADR 007 (error handling)](plan/03-decisions/007-error-handling-strategy.md)
 
 Public API **must** be documented.
 
-Use `///` (or `/** */`) on:
+Prefer block comments `/** ... */` for multi-line documentation (class and
+function docs). Single-line `///` is acceptable for very short notes.
+
+Document:
 
 - Every public class / struct (responsibility, ownership)
 - Every public function / method:
