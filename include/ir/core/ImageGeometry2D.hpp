@@ -3,9 +3,10 @@
 #include <ir/core/Point2D.hpp>
 
 #include <Eigen/Core>
+#include <Eigen/LU>
 
 #include <cassert>
-#include <cmath>
+#include <utility>
 
 namespace ir {
 
@@ -34,7 +35,7 @@ public:
      * @param spacing Physical size per index step (x along i, y along j).
      * @param origin Physical coordinates of the center of pixel (0, 0).
      */
-    ImageGeometry2D(int width, int height, Point2D spacing, Point2D origin) noexcept
+    ImageGeometry2D(int width, int height, Point2D spacing, Point2D origin)
         : ImageGeometry2D(width, height, spacing, origin, Eigen::Matrix2d::Identity()) {}
 
     /**
@@ -46,7 +47,7 @@ public:
      * @param direction 2x2 direction matrix (columns = local axes in physical space).
      */
     ImageGeometry2D(int width, int height, Point2D spacing, Point2D origin,
-                    Eigen::Matrix2d direction) noexcept
+                    Eigen::Matrix2d direction)
         : m_width(width)
         , m_height(height)
         , m_spacing(spacing)
@@ -77,7 +78,7 @@ public:
      * @param j Index along height (typically in [0, height)).
      * @return Physical coordinates of the center of pixel (i, j).
      */
-    [[nodiscard]] Point2D indexToPhysical(int i, int j) const noexcept {
+    [[nodiscard]] Point2D indexToPhysical(int i, int j) const {
         const Eigen::Vector2d local{static_cast<double>(i) * m_spacing.x(),
                                     static_cast<double>(j) * m_spacing.y()};
         const Eigen::Vector2d physical = m_origin.toEigen() + m_direction * local;
@@ -89,8 +90,9 @@ public:
      * @param physical Point in physical space.
      * @return Continuous indices (i, j); may be fractional between pixel centers.
      */
-    [[nodiscard]] Point2D physicalToIndex(const Point2D& physical) const noexcept {
-        const Eigen::Vector2d local = m_direction.inverse() * (physical.toEigen() - m_origin.toEigen());
+    [[nodiscard]] Point2D physicalToIndex(const Point2D& physical) const {
+        const Eigen::Vector2d delta = physical.toEigen() - m_origin.toEigen();
+        const Eigen::Vector2d local = m_direction.inverse() * delta;
         return Point2D{local.x() / m_spacing.x(), local.y() / m_spacing.y()};
     }
 
@@ -118,7 +120,7 @@ private:
  * @param b Second geometry.
  * @return True if all stored fields compare equal.
  */
-[[nodiscard]] inline bool operator==(const ImageGeometry2D& a, const ImageGeometry2D& b) noexcept {
+[[nodiscard]] inline bool operator==(const ImageGeometry2D& a, const ImageGeometry2D& b) {
     return a.width() == b.width() && a.height() == b.height() && a.spacing() == b.spacing() &&
            a.origin() == b.origin() && a.direction() == b.direction();
 }
@@ -129,7 +131,7 @@ private:
  * @param b Second geometry.
  * @return True if any stored field differs.
  */
-[[nodiscard]] inline bool operator!=(const ImageGeometry2D& a, const ImageGeometry2D& b) noexcept {
+[[nodiscard]] inline bool operator!=(const ImageGeometry2D& a, const ImageGeometry2D& b) {
     return !(a == b);
 }
 
