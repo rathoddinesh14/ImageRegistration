@@ -1,12 +1,11 @@
 #pragma once
 
+#include <cassert>
 #include <ir/core/Point2D.hpp>
+#include <utility>
 
 #include <Eigen/Core>
 #include <Eigen/LU>
-
-#include <cassert>
-#include <utility>
 
 namespace ir {
 
@@ -48,11 +47,11 @@ public:
      */
     ImageGeometry2D(int width, int height, Point2D spacing, Point2D origin,
                     Eigen::Matrix2d direction)
-        : m_width(width)
-        , m_height(height)
-        , m_spacing(spacing)
-        , m_origin(origin)
-        , m_direction(std::move(direction)) {
+        : m_width(width),
+          m_height(height),
+          m_spacing(spacing),
+          m_origin(origin),
+          m_direction(std::move(direction)) {
         assert(m_width >= 1);
         assert(m_height >= 1);
     }

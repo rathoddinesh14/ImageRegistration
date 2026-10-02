@@ -52,8 +52,7 @@ TEST_CASE("ImageGeometry2D accepts an explicit direction matrix", "[core][ImageG
     REQUIRE(geom.direction().isApprox(dir, kTol));
 }
 
-TEST_CASE("ImageGeometry2D index (0,0) maps to origin as pixel center",
-          "[core][ImageGeometry2D]") {
+TEST_CASE("ImageGeometry2D index (0,0) maps to origin as pixel center", "[core][ImageGeometry2D]") {
     const ir::Point2D origin{3.0, -4.0};
     const ir::ImageGeometry2D geom{5, 7, ir::Point2D{1.0, 1.0}, origin};
 
