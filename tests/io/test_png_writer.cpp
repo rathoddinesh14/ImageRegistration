@@ -6,6 +6,7 @@
 #include <ir/core/ImageGeometry2D.hpp>
 #include <ir/core/Point2D.hpp>
 #include <ir/io/ExportOptions.hpp>
+#include <ir/io/ImageWrite.hpp>
 #include <ir/io/PngWriter.hpp>
 #include <string>
 #include <vector>
@@ -241,4 +242,22 @@ TEST_CASE("PngWriter sample artifacts: gradient disk checkerboard", "[io][PngWri
         REQUIRE(ir::io::writePng(board, path.string()));
         REQUIRE(fileStartsWithPngSignature(path));
     }
+}
+
+TEST_CASE("write facade dispatches .png to PngWriter", "[io][ImageWrite]") {
+    const ir::Image2D image{makeGeometry(2, 2)};
+    const auto path = uniqueTempPng("facade_png");
+    std::filesystem::remove(path);
+
+    REQUIRE(ir::io::write(image, path.string()));
+    REQUIRE(fileStartsWithPngSignature(path));
+
+    std::filesystem::remove(path);
+}
+
+TEST_CASE("write facade rejects unsupported extensions", "[io][ImageWrite]") {
+    const ir::Image2D image{makeGeometry(2, 2)};
+    REQUIRE_FALSE(ir::io::write(image, "out.bmp"));
+    REQUIRE_FALSE(ir::io::write(image, "out"));
+    REQUIRE_FALSE(ir::io::write(image, ""));
 }

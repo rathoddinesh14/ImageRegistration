@@ -87,3 +87,7 @@ venv/
 *.tmp
 *.temp
 *.temp-stream-*
+
+# Generated image samples (produced by tests / CI; not source)
+artifacts/io_png_samples/
+io_png_samples/

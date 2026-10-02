@@ -10,7 +10,9 @@ Optional **IO** to write `Image2D` as **PNG** (stb_image_write), core stays free
 ## Modular design
 - Shared `ExportOptions` / `ScalingMode::Clamp01`
 - Per-format `PngWriter` (future writers can share raster policy)
+- Facade `ir::io::write(image, path)` dispatches by extension (`.png` → PngWriter)
 - CMake target `ir::io` (`IR_BUILD_IO`; auto-on with tests)
+- Sample PNGs generated in CI (not committed); download from workflow artifacts
 
 ## Acceptance criteria
 - [x] `include/ir/io/ExportOptions.hpp`, `PngWriter.hpp` + `src/io/PngWriter.cpp`
