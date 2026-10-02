@@ -24,8 +24,7 @@ public:
      * @param geometry Image geometry (width and height must be >= 1).
      */
     explicit Image2D(ImageGeometry2D geometry)
-        : m_geometry(std::move(geometry))
-        , m_pixels(static_cast<std::size_t>(pixelCount()), 0.0) {}
+        : m_geometry(std::move(geometry)), m_pixels(static_cast<std::size_t>(pixelCount()), 0.0) {}
 
     /**
      * Construct an image with geometry and an existing pixel buffer.
@@ -106,9 +105,7 @@ public:
     /**
      * @return Pointer to the first pixel in the row-major buffer.
      */
-    [[nodiscard]] double* data() noexcept {
-        return m_pixels.empty() ? nullptr : m_pixels.data();
-    }
+    [[nodiscard]] double* data() noexcept { return m_pixels.empty() ? nullptr : m_pixels.data(); }
 
     /** @return Number of elements in the pixel buffer (same as pixelCount). */
     [[nodiscard]] std::size_t dataSize() const noexcept { return m_pixels.size(); }
