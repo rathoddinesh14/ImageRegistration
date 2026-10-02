@@ -4,6 +4,7 @@ add_executable(ir_tests
   test_smoke.cpp
   core/test_point2d.cpp
   core/test_image_geometry2d.cpp
+  core/test_image2d.cpp
 )
 
 target_link_libraries(ir_tests
