@@ -11,6 +11,7 @@ add_executable(ir_tests
 target_link_libraries(ir_tests
   PRIVATE
     ir::ImageRegistration
+    ir::io
     Catch2::Catch2WithMain
 )
 
