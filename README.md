@@ -1,52 +1,121 @@
 # ImageRegistration
 
-A clean, modular, extensible 2D image-registration library written in modern C++ (C++20).
+Modern **C++20** library for **2D image registration**, designed to stay modular and extensible (including a future path to 3D and time-series).
 
-## Purpose
+| | |
+|---|---|
+| **License** | MIT |
+| **Language** | C++20 |
+| **Core dependency** | [Eigen](https://eigen.tuxfamily.org/) 3.3+ |
+| **Tests** | [Catch2](https://github.com/catchorg/Catch2) (optional) |
+| **CI** | GitHub Actions (Windows build/test, clang-format, clang-tidy, API docs) |
 
-Provide a well-structured foundation for 2D image registration algorithms. The design emphasizes separation of concerns, dependency inversion, and composition so that future extensions (including 3D support) can be added without major refactoring of the core.
+## What this library is
 
-## Current Scope
+A **composition-friendly** registration stack:
 
-- **2D image registration only**
-- No algorithm implementations yet — this repository currently contains only the project structure, public headers (declarations), and build scaffolding.
+- Small **value types** and pure interfaces first  
+- Algorithms plugged in later (metrics, optimizers, transforms)  
+- Core stays free of I/O and heavy frameworks  
 
-## High-Level Architecture
+```text
+Fixed image + moving image
+        │
+        ▼
+  transform + metric + interpolator + optimizer
+        │
+        ▼
+  RegistrationResult (success, transform, metric value, …)
+```
 
-| Component       | Responsibility                                      |
-|-----------------|-----------------------------------------------------|
-| `core`          | Fundamental 2D image and geometry concepts          |
-| `transform`     | Transformation abstractions (translation, rigid, affine) |
-| `interpolator`  | Strategies for evaluating an image at non-integer coordinates |
-| `metric`        | Similarity / dissimilarity metric abstractions      |
-| `optimizer`     | Optimization abstractions                           |
-| `resampler`     | Generation of a transformed / resampled image       |
-| `registration`  | High-level registration orchestration               |
+## Current status
 
-Public headers live under `include/ir/`. Implementation files will live under `src/`. Tests mirror the source layout under `tests/`.
+| Area | Status |
+|------|--------|
+| Build / CI / coding standards | In place |
+| `Point2D` | Implemented + tested |
+| `ImageGeometry2D` | Implemented + tested (this PR) |
+| `Image2D`, transforms, metrics, optimizers | Planned (see `docs/plan/`) |
+| Full registration pipeline | Not yet |
 
-## Build Prerequisites
+## Architecture (target)
 
-- CMake ≥ 3.16
-- A C++20-compliant compiler
-- Eigen 3.3+ (linear algebra)
+| Component | Role |
+|-----------|------|
+| **core** | Points, image geometry, images |
+| **transform** | Translation, rigid, affine, … |
+| **interpolator** | Sample image at non-integer coordinates |
+| **metric** | Similarity / dissimilarity |
+| **optimizer** | Parameter search |
+| **resampler** | Warp / resample an image |
+| **registration** | Orchestrate a full run |
 
-## Basic Build Commands
+Public API: `include/ir/`. Tests: `tests/`. Plan and ADRs: `docs/plan/`.
+
+## Requirements
+
+- CMake ≥ 3.16  
+- C++20 compiler (MSVC on Windows is the CI baseline)  
+- Eigen 3.3+ (system install or fetched by CMake)  
+
+## Build
 
 ```bash
-# Configure (release build, no tests/examples)
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-
-# Configure with tests
+# Configure with tests (recommended while developing)
 cmake -S . -B build -DIR_BUILD_TESTS=ON
 
 # Build
-cmake --build build
+cmake --build build --config Release
 
-# Install (optional)
-cmake --install build
+# Run tests
+ctest --test-dir build -C Release --output-on-failure
 ```
 
-## Status
+Optional flags:
 
-Implementation is intentionally not yet present. The repository currently provides only the directory layout, empty/declaration-only headers, CMake configuration, and documentation placeholders.
+| Option | Default | Meaning |
+|--------|---------|---------|
+| `IR_BUILD_TESTS` | `OFF` | Build Catch2 unit tests |
+| `IR_BUILD_EXAMPLES` | `OFF` | Examples (placeholder) |
+| `IR_BUILD_BENCHMARKS` | `OFF` | Benchmarks (placeholder) |
+
+### Windows (Visual Studio)
+
+Prefer an **x64 Native Tools** prompt (or CMake Tools in VS Code) so MSVC is used—not MinGW/Strawberry on `PATH`.
+
+```powershell
+cmake -S . -B build -DIR_BUILD_TESTS=ON -G "Visual Studio 17 2022" -A x64
+cmake --build build --config Release
+ctest --test-dir build -C Release --output-on-failure
+```
+
+### VS Code
+
+This repo includes `.vscode/settings.json` and extension recommendations (C/C++, CMake Tools). Open the **folder**, configure with CMake Tools, then use Go to Definition / Ctrl+click.
+
+## Layout
+
+```text
+include/ir/          Public headers (core, transform, …)
+tests/               Catch2 tests
+docs/plan/           Vision, backlog, ADRs, implemented notes
+.github/workflows/   CI
+```
+
+## Documentation
+
+- [Coding standards](docs/coding-standards.md)  
+- [Design principles](docs/plan/00-vision/design-principles.md)  
+- [Backlog](docs/plan/02-backlog/)  
+- [Decisions (ADRs)](docs/plan/03-decisions/)  
+
+## Contributing
+
+1. Prefer **tests-first** for new types and algorithms.  
+2. Follow naming: `PascalCase` types, `camelCase` methods, `m_` members, `#pragma once`.  
+3. Prefer `/** … */` for multi-line public API docs.  
+4. Keep CI green (format, tidy, Windows tests).  
+
+## License
+
+MIT — see [LICENSE](LICENSE).
