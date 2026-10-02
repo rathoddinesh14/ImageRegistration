@@ -2,7 +2,6 @@
 
 #include <ir/core/Image2D.hpp>
 #include <ir/io/ExportOptions.hpp>
-
 #include <string>
 
 namespace ir::io {

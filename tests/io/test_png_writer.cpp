@@ -45,11 +45,19 @@ namespace {
 
 /** Directory for committed/reviewable sample PNGs (override with IR_PNG_SAMPLE_DIR). */
 [[nodiscard]] std::filesystem::path sampleOutputDir() {
+#if defined(_MSC_VER)
+    char* buffer = nullptr;
+    size_t length = 0;
+    if (_dupenv_s(&buffer, &length, "IR_PNG_SAMPLE_DIR") == 0 && buffer != nullptr) {
+        std::filesystem::path path{buffer};
+        free(buffer);
+        return path;
+    }
+#else
     if (const char* env = std::getenv("IR_PNG_SAMPLE_DIR")) {
         return std::filesystem::path{env};
     }
-    // Default: <repo>/artifacts/io_png_samples when running from build tree is unknown;
-    // tests also accept CMAKE-defined path via the same env set by CI/example.
+#endif
     return std::filesystem::current_path() / "io_png_samples";
 }
 

@@ -1,10 +1,9 @@
 #pragma once
 
+#include <cctype>
 #include <ir/core/Image2D.hpp>
 #include <ir/io/ExportOptions.hpp>
 #include <ir/io/PngWriter.hpp>
-
-#include <cctype>
 #include <string>
 
 namespace ir::io {
@@ -38,7 +37,7 @@ namespace detail {
  *
  * @param image Source image.
  * @param path Output path; extension selects the writer (e.g. out.png).
- * @param options Shared export options (scaling, …).
+ * @param options Shared export options (scaling, ...).
  * @return True on success; false if the extension is unsupported or write fails.
  */
 [[nodiscard]] inline bool write(const Image2D& image, const std::string& path,

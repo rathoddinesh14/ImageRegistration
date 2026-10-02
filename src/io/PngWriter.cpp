@@ -1,8 +1,7 @@
-#include <ir/io/PngWriter.hpp>
-
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <ir/io/PngWriter.hpp>
 #include <vector>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
