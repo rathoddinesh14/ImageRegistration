@@ -1,6 +1,6 @@
 # Task: Image2D
 
-**Status**: in progress (TDD — tests first on branch `feature/image2d-tdd-tests`)  
+**Status**: done (branch `feature/image2d-tdd-tests`)  
 **Component**: core
 
 ## Goal
@@ -15,9 +15,9 @@ Define the core 2D image type that owns pixel data + geometry.
 - No I/O; no non-owning view type in v0.1
 
 ## Acceptance criteria
-- [ ] Header: `include/ir/core/Image2D.hpp`
-- [ ] Combines pixel storage with `ImageGeometry2D`
-- [x] Unit tests: `tests/core/test_image2d.cpp` (written first)
+- [x] Header: `include/ir/core/Image2D.hpp`
+- [x] Combines pixel storage with `ImageGeometry2D`
+- [x] Unit tests: `tests/core/test_image2d.cpp`
 
 ## Notes
 Eigen matrix backend deferred; simplest correct owning buffer first.
