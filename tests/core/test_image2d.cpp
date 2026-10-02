@@ -151,7 +151,7 @@ TEST_CASE("Image2D data view exposes contiguous buffer of pixelCount length", "[
     image.at(0, 1) = 3.0;
     image.at(1, 1) = 4.0;
 
-    REQUIRE(image.dataSize() == image.pixelCount());
+    REQUIRE(image.dataSize() == static_cast<std::size_t>(image.pixelCount()));
     REQUIRE(image.data() != nullptr);
     REQUIRE_THAT(image.data()[0], WithinAbs(1.0, kTol));
     REQUIRE_THAT(image.data()[1], WithinAbs(2.0, kTol));
