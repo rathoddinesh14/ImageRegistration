@@ -46,8 +46,7 @@ TEST_CASE("Transform2D is an abstract polymorphic base", "[transform][Transform2
     STATIC_REQUIRE(std::has_virtual_destructor_v<ir::Transform2D>);
 }
 
-TEST_CASE("Transform2D transformPoint maps points via concrete implementation",
-          "[transform][Transform2D]") {
+TEST_CASE("Transform2D transformPoint maps via concrete impl", "[transform][Transform2D]") {
     const TranslationStub transform{ir::Point2D{2.0, -3.0}};
     const ir::Point2D input{1.0, 4.0};
 
@@ -80,8 +79,7 @@ TEST_CASE("Transform2D transformPoint is const-callable", "[transform][Transform
     REQUIRE_THAT(out.y(), WithinAbs(0.25, kTol));
 }
 
-TEST_CASE("Transform2D identity-like stub leaves origin fixed when offset is zero",
-          "[transform][Transform2D]") {
+TEST_CASE("Transform2D zero offset leaves origin fixed", "[transform][Transform2D]") {
     const TranslationStub identity{ir::Point2D{0.0, 0.0}};
     const ir::Point2D origin{};
     const ir::Point2D out = identity.transformPoint(origin);
@@ -90,21 +88,18 @@ TEST_CASE("Transform2D identity-like stub leaves origin fixed when offset is zer
     REQUIRE_THAT(out.y(), WithinAbs(0.0, kTol));
 }
 
-TEST_CASE("Transform2D isInvertible reports true for invertible stub",
-          "[transform][Transform2D]") {
+TEST_CASE("Transform2D isInvertible true for invertible stub", "[transform][Transform2D]") {
     const TranslationStub transform{ir::Point2D{1.0, 0.0}};
     REQUIRE(transform.isInvertible());
     REQUIRE(static_cast<const ir::Transform2D&>(transform).isInvertible());
 }
 
-TEST_CASE("Transform2D isInvertible reports false for non-invertible stub",
-          "[transform][Transform2D]") {
+TEST_CASE("Transform2D isInvertible false for non-invertible stub", "[transform][Transform2D]") {
     const NonInvertibleStub transform;
     REQUIRE_FALSE(transform.isInvertible());
 }
 
-TEST_CASE("Transform2D can be owned via unique_ptr for polymorphic lifetime",
-          "[transform][Transform2D]") {
+TEST_CASE("Transform2D unique_ptr polymorphic ownership", "[transform][Transform2D]") {
     std::unique_ptr<ir::Transform2D> transform =
         std::make_unique<TranslationStub>(ir::Point2D{-1.0, 2.0});
 
@@ -114,10 +109,8 @@ TEST_CASE("Transform2D can be owned via unique_ptr for polymorphic lifetime",
     REQUIRE(transform->isInvertible());
 }
 
-TEST_CASE("Transform2D inverse is not part of v0.1 interface (Expected deferred)",
-          "[transform][Transform2D]") {
-    // Contract documentation test: invertibility is discoverable; materializing
-    // an inverse transform is deferred until ir::Expected lands (ADR 007).
+TEST_CASE("Transform2D inverse API deferred to Expected", "[transform][Transform2D]") {
+    // Invertibility is discoverable; materializing inverse waits for ir::Expected.
     const TranslationStub invertible{ir::Point2D{1.0, 1.0}};
     const NonInvertibleStub notInvertible{};
 
