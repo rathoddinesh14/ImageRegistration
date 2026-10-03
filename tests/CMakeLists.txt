@@ -6,6 +6,7 @@ add_executable(ir_tests
   core/test_image_geometry2d.cpp
   core/test_image2d.cpp
   io/test_png_writer.cpp
+  transform/test_transform2d.cpp
 )
 
 target_link_libraries(ir_tests
