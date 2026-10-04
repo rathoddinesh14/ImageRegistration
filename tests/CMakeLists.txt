@@ -7,6 +7,7 @@ add_executable(ir_tests
   core/test_image2d.cpp
   io/test_png_writer.cpp
   transform/test_transform2d.cpp
+  transform/test_translation2d.cpp
 )
 
 target_link_libraries(ir_tests
