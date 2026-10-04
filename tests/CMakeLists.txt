@@ -9,6 +9,7 @@ add_executable(ir_tests
   transform/test_transform2d.cpp
   transform/test_translation2d.cpp
   transform/test_rigid2d.cpp
+  interpolator/test_interpolator2d.cpp
 )
 
 target_link_libraries(ir_tests
