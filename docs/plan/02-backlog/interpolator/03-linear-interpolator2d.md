@@ -1,14 +1,13 @@
 # Task: LinearInterpolator2D (bilinear)
 
-**Status**: todo  
+**Status**: done (branch `feature/linear-interpolator2d`)  
 **Component**: interpolator  
 **Priority**: Medium  
-**Depends on**: Interpolator2D interface
 
-## Goal
-Bilinear interpolation in index space.
+## Design
+- Bilinear weights on unit square in continuous index space
+- BoundsPolicy Constant / Clamp per corner sample
 
 ## Acceptance criteria
-- [ ] Header under `include/ir/interpolator/`
-- [ ] Correct weights on unit square; Catch2 tests with known analytic cases
-- [ ] Documented OOB behavior
+- [x] `LinearInterpolator2D.hpp`
+- [x] Analytic Catch2 cases + OOB
