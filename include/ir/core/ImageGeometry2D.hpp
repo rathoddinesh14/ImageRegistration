@@ -12,9 +12,11 @@ namespace ir {
 /**
  * Geometric properties of a 2D image (no pixel data).
  *
- * Coordinate conventions:
- * - Index space uses integer pixel indices (i, j) with i in [0, width) and
- *   j in [0, height).
+ * Coordinate conventions (authoritative detail):
+ *   docs/architecture/coordinate-conventions.md
+ *
+ * Summary:
+ * - Index space: integer (i, j) with i in [0, width), j in [0, height).
  * - Origin is the physical position of the center of pixel (0, 0).
  * - Spacing is the physical size of one index step along each local axis.
  * - Direction is a 2x2 matrix whose columns are the local axis directions

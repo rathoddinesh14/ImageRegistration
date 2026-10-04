@@ -104,7 +104,8 @@ docs/plan/           Vision, backlog, ADRs, implemented notes
 
 ## Documentation
 
-- [Coding standards](docs/coding-standards.md)  
+- [Coding standards](docs/coding-standards.md)
+- [Coordinate conventions](docs/architecture/coordinate-conventions.md)  
 - [Design principles](docs/plan/00-vision/design-principles.md)  
 - [Backlog](docs/plan/02-backlog/)  
 - [Decisions (ADRs)](docs/plan/03-decisions/)  
