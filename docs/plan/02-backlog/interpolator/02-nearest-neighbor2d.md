@@ -1,14 +1,14 @@
 # Task: NearestNeighborInterpolator2D
 
-**Status**: todo  
+**Status**: done (branch `feature/nearest-neighbor-interpolator`)  
 **Component**: interpolator  
 **Priority**: High  
-**Depends on**: Interpolator2D interface
 
-## Goal
-Nearest-neighbor sampling at continuous indices (round to nearest integer index inside bounds).
+## Design
+- Round continuous index with `std::lround`
+- `BoundsPolicy::Constant` (default fill 0) or `Clamp`
+- Constant(0) is convenience only; not ideal for metrics long-term
 
 ## Acceptance criteria
-- [ ] `include/ir/interpolator/NearestNeighborInterpolator2D.hpp`
-- [ ] Matches documented OOB policy
-- [ ] Catch2 tests: exact centers, half-way ties documented, OOB
+- [x] Header + BoundsPolicy
+- [x] Catch2: centers, rounding, Constant/Clamp OOB, polymorphism
