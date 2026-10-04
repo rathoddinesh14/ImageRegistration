@@ -94,8 +94,7 @@ TEST_CASE("LinearInterpolator works through Interpolator2D base", "[interpolator
 
 TEST_CASE("LinearInterpolator unique_ptr ownership", "[interpolator][Linear]") {
     const ir::Image2D image = makeImage2x2();
-    std::unique_ptr<ir::Interpolator2D> interpolator =
-        std::make_unique<ir::LinearInterpolator2D>();
+    auto interpolator = std::make_unique<ir::LinearInterpolator2D>();
 
     REQUIRE_THAT(interpolator->evaluate(image, ir::Point2D{0.0, 0.0}), WithinAbs(1.0, kTol));
 }
