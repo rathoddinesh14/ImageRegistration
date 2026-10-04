@@ -5,6 +5,7 @@
 #include <ir/core/Point2D.hpp>
 #include <ir/interpolator/BoundsPolicy.hpp>
 #include <ir/interpolator/Interpolator2D.hpp>
+#include <ir/interpolator/sampleAt.hpp>
 
 namespace ir {
 
@@ -15,9 +16,7 @@ namespace ir {
  * (floor(x), floor(y)), (floor(x)+1, floor(y)), etc., and standard bilinear
  * weights. Integer lattice points are pixel centers.
  *
- * Out-of-bounds (per corner sample):
- * - BoundsPolicy::Constant — use fillValue for any corner outside the image
- * - BoundsPolicy::Clamp — clamp corner indices to the valid lattice
+ * Out-of-bounds (per corner): see BoundsPolicy and sampleAt().
  */
 class LinearInterpolator2D final : public Interpolator2D {
 public:
@@ -54,10 +53,10 @@ public:
         const double fx = x - static_cast<double>(i0);
         const double fy = y - static_cast<double>(j0);
 
-        const double v00 = sample(image, i0, j0);
-        const double v10 = sample(image, i1, j0);
-        const double v01 = sample(image, i0, j1);
-        const double v11 = sample(image, i1, j1);
+        const double v00 = sampleAt(image, i0, j0, m_policy, m_fillValue);
+        const double v10 = sampleAt(image, i1, j0, m_policy, m_fillValue);
+        const double v01 = sampleAt(image, i0, j1, m_policy, m_fillValue);
+        const double v11 = sampleAt(image, i1, j1, m_policy, m_fillValue);
 
         const double v0 = v00 * (1.0 - fx) + v10 * fx;
         const double v1 = v01 * (1.0 - fx) + v11 * fx;
@@ -65,34 +64,6 @@ public:
     }
 
 private:
-    [[nodiscard]] double sample(const Image2D& image, int i, int j) const {
-        if (image.containsIndex(i, j)) {
-            return image.at(i, j);
-        }
-        switch (m_policy) {
-        case BoundsPolicy::Constant:
-            return m_fillValue;
-        case BoundsPolicy::Clamp: {
-            int ci = i;
-            int cj = j;
-            const int w = image.width();
-            const int h = image.height();
-            if (ci < 0) {
-                ci = 0;
-            } else if (ci >= w) {
-                ci = w - 1;
-            }
-            if (cj < 0) {
-                cj = 0;
-            } else if (cj >= h) {
-                cj = h - 1;
-            }
-            return image.at(ci, cj);
-        }
-        }
-        return m_fillValue;
-    }
-
     BoundsPolicy m_policy = BoundsPolicy::Constant;
     double m_fillValue = 0.0;
 };
