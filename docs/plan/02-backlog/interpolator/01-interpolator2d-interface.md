@@ -1,19 +1,15 @@
 # Task: Interpolator2D pure interface
 
-**Status**: todo  
+**Status**: done (branch `feature/interpolator2d-interface`)  
 **Component**: interpolator  
 **Priority**: High  
-**Depends on**: Image2D, Point2D, conventions doc (done)
 
-## Goal
-Pure abstraction: evaluate an image at a continuous index (or physical point—**pick one and document**; prefer continuous **index** space for interpolators).
-
-## Draft API
-- `double evaluate(const Image2D& image, const Point2D& continuousIndex) const`
-- Policy for out-of-bounds (return 0, edge clamp, or signal via Expected later)
+## Design locked
+- Continuous **index** space `(i, j)` via `Point2D`
+- `evaluate(const Image2D&, const Point2D&) const`
+- v0.1 OOB: concrete types document policy; recommended return `0.0`
 
 ## Acceptance criteria
-- [ ] `include/ir/interpolator/Interpolator2D.hpp`
-- [ ] Documented bounds policy for v0.1
-- [ ] Catch2 tests via test-only stub
-- [ ] No production concrete interpolator required in this task
+- [x] `include/ir/interpolator/Interpolator2D.hpp`
+- [x] Catch2 tests via test-only stub
+- [x] No production concrete interpolator in this task
