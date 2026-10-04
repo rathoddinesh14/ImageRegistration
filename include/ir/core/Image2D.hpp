@@ -11,6 +11,9 @@ namespace ir {
 /**
  * Owning 2D image: geometry plus a contiguous pixel buffer.
  *
+ * Coordinate and layout conventions:
+ *   docs/architecture/coordinate-conventions.md
+ *
  * Pixel type is double. Storage is row-major:
  *   linearIndex = j * width + i
  * for integer index (i, j) with i in [0, width) and j in [0, height).
