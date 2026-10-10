@@ -76,7 +76,7 @@ Optional flags:
 | Option | Default | Meaning |
 |--------|---------|---------|
 | `IR_BUILD_TESTS` | `OFF` | Build Catch2 unit tests |
-| `IR_BUILD_EXAMPLES` | `OFF` | Examples (placeholder) |
+| `IR_BUILD_EXAMPLES` | `OFF` | Examples (synthetic translation demo) |
 | `IR_BUILD_BENCHMARKS` | `OFF` | Benchmarks (placeholder) |
 
 ### Windows (Visual Studio)
