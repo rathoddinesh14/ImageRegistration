@@ -30,8 +30,7 @@ public:
      * @param moving Moving image (same size expected in v0.1).
      * @return Scalar metric value.
      */
-    [[nodiscard]] virtual double evaluate(const Image2D& fixed,
-                                          const Image2D& moving) const = 0;
+    [[nodiscard]] virtual double evaluate(const Image2D& fixed, const Image2D& moving) const = 0;
 
     /**
      * Report optimization direction.
