@@ -11,6 +11,7 @@ add_executable(ir_tests
   transform/test_rigid2d.cpp
   interpolator/test_interpolator2d.cpp
   interpolator/test_nearest_neighbor2d.cpp
+  interpolator/test_linear_interpolator2d.cpp
 )
 
 target_link_libraries(ir_tests
