@@ -14,6 +14,7 @@ add_executable(ir_tests
   interpolator/test_linear_interpolator2d.cpp
   metric/test_metric2d.cpp
   metric/test_mean_squares_metric2d.cpp
+  resampler/test_resampler2d.cpp
 )
 
 target_link_libraries(ir_tests
