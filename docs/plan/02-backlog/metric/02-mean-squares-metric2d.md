@@ -1,14 +1,13 @@
 # Task: MeanSquaresMetric2D (MSE)
 
-**Status**: todo  
+**Status**: done (branch `feature/mean-squares-metric2d`)  
 **Component**: metric  
 **Priority**: High  
-**Depends on**: Metric2D interface
 
-## Goal
-Mean squared intensity difference over overlapping samples (define sampling: all fixed pixels for v0.1).
+## Design
+- MSE over all fixed lattice pixels; same width/height required (assert)
+- `isMinimize()` always true
 
 ## Acceptance criteria
-- [ ] Concrete metric header/implementation
-- [ ] Minimize direction (lower is better)
-- [ ] Catch2: identical images → 0; known constant difference
+- [x] `MeanSquaresMetric2D.hpp`
+- [x] Catch2: identical → 0; constant difference; polymorphism
