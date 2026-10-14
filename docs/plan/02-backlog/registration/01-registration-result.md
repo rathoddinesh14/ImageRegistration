@@ -1,32 +1,13 @@
 # Task: RegistrationResult / solve summary type
 
-**Status**: todo  
+**Status**: done (branch `feature/registration-result`)  
 **Component**: registration  
-**Priority**: Medium (before implementing Registration2D::run)
+**Priority**: Medium  
 
-## Goal
-Define a result/summary type for registration runs so success/failure and diagnostics are explicit (Ceres-style), not only exceptions or a bare bool.
+## Delivered
+- `include/ir/registration/RegistrationResult.hpp`
+- Minimal `include/ir/core/ErrorCode.hpp` (shared with future Error / Expected)
+- Catch2 tests for default, success, failure
 
-## Draft shape
-
-```cpp
-struct RegistrationResult {
-    bool succeeded = false;
-    ErrorCode code = ErrorCode::Ok;
-    // transform parameters or Transform2D — exact type TBD
-    double finalMetric = 0.0;
-    int iterations = 0;
-    // optional: message string_view or Error
-};
-```
-
-## Requirements
-- Header under `include/ir/registration/`
-- Documented fields and validity rules (e.g. transform valid only if `succeeded`)
-- Used as return type of `Registration2D::run` (future)
-- Unit tests for default state and typical success/failure values
-- Aligns with hybrid error-handling ADR
-
-## Related
-- `docs/plan/02-backlog/infrastructure/07-error-handling-strategy.md`
-- Future `Registration2D` interface task
+## Notes
+Transform parameters not stored on the result yet (ownership TBD).

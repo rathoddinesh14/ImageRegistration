@@ -16,6 +16,7 @@ add_executable(ir_tests
   metric/test_mean_squares_metric2d.cpp
   resampler/test_resampler2d.cpp
   resampler/test_image_resampler2d.cpp
+  registration/test_registration_result.cpp
 )
 
 target_link_libraries(ir_tests
