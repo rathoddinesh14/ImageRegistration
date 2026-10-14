@@ -53,9 +53,10 @@ target_link_libraries(ImageRegistration
 # Optional IO library (PNG export via stb_image_write; not linked into core)
 option(IR_BUILD_IO "Build optional IO library (PNG write)" OFF)
 
-# Optional tests
+# Optional tests / examples
 option(IR_BUILD_TESTS "Build unit tests" OFF)
-if(IR_BUILD_TESTS)
+option(IR_BUILD_EXAMPLES "Build examples" OFF)
+if(IR_BUILD_TESTS OR IR_BUILD_EXAMPLES)
   set(IR_BUILD_IO ON)
 endif()
 
@@ -96,7 +97,6 @@ if(IR_BUILD_TESTS)
 endif()
 
 # Optional examples
-option(IR_BUILD_EXAMPLES "Build examples" OFF)
 if(IR_BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()

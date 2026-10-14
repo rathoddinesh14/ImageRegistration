@@ -1,14 +1,10 @@
 # Task: Example — synthetic translation + PNG
 
-**Status**: todo  
+**Status**: done (branch `feature/example-synthetic-translation`)  
 **Component**: examples  
 **Priority**: Medium  
-**Depends on**: Translation2D, Image2D, writePng (done)
-
-## Goal
-Runnable example under `examples/` that builds a synthetic image, applies a known shift in index/physical space, writes before/after PNGs (when IO enabled).
 
 ## Acceptance criteria
-- [ ] `examples/` target wired in CMake when `IR_BUILD_EXAMPLES=ON`
-- [ ] Demonstrates geometry + Translation2D usage
-- [ ] Documented how to run in README or example comment
+- [x] `examples/synthetic_translation/` with CMake target
+- [x] Disk shift + Translation2D + NN resample + MSE before/after
+- [x] Optional PNG write when IO enabled
