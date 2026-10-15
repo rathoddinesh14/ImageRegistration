@@ -39,8 +39,7 @@ struct RegistrationResult {
     /**
      * @return A successful result with the given metric and iteration count.
      */
-    [[nodiscard]] static RegistrationResult success(double finalMetric,
-                                                    int iterations = 0) {
+    [[nodiscard]] static RegistrationResult success(double finalMetric, int iterations = 0) {
         RegistrationResult r;
         r.succeeded = true;
         r.code = ErrorCode::Ok;
@@ -52,8 +51,7 @@ struct RegistrationResult {
     /**
      * @return A failed result with the given code and optional message.
      */
-    [[nodiscard]] static RegistrationResult failure(ErrorCode code,
-                                                    std::string message = {}) {
+    [[nodiscard]] static RegistrationResult failure(ErrorCode code, std::string message = {}) {
         RegistrationResult r;
         r.succeeded = false;
         r.code = code;

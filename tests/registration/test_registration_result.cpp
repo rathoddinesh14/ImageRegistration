@@ -14,8 +14,7 @@ constexpr double kTol = 1e-12;
 
 } // namespace
 
-TEST_CASE("RegistrationResult default is unsuccessful Ok-shaped zeros",
-          "[registration][RegistrationResult]") {
+TEST_CASE("RegistrationResult default state", "[registration][RegistrationResult]") {
     const ir::RegistrationResult r;
     REQUIRE_FALSE(r.succeeded);
     REQUIRE(r.code == ir::ErrorCode::Ok);
@@ -47,8 +46,7 @@ TEST_CASE("RegistrationResult is a regular value type", "[registration][Registra
     STATIC_REQUIRE(std::is_move_constructible_v<ir::RegistrationResult>);
 }
 
-TEST_CASE("ErrorCode enumerators exist for registration diagnostics",
-          "[registration][ErrorCode]") {
+TEST_CASE("ErrorCode enumerators exist", "[registration][ErrorCode]") {
     REQUIRE(static_cast<int>(ir::ErrorCode::Ok) == 0);
     REQUIRE(ir::ErrorCode::SingularTransform != ir::ErrorCode::Ok);
     REQUIRE(ir::ErrorCode::NonFiniteMetric != ir::ErrorCode::Unknown);
