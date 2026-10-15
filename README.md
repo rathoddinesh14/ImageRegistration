@@ -47,97 +47,130 @@ Fixed image + moving image
 
 ## Mathematical formulation (implemented)
 
-Notation uses continuous **index** coordinates \((i, j)\) and **physical** coordinates \((x, y)\). Integer lattice sites are **pixel centers**. See [coordinate conventions](docs/architecture/coordinate-conventions.md).
+Notation uses continuous **index** coordinates $(i, j)$ and **physical** coordinates
+$(x, y)$. Integer lattice sites are **pixel centers**. See
+[coordinate conventions](docs/architecture/coordinate-conventions.md).
 
 ### Geometry
 
-For width \(W\), height \(H\), spacing \(\mathbf{s} = (s_i, s_j)\), origin \(\mathbf{o}\) (physical location of index \((0,0)\)), and \(2\times 2\) direction matrix \(\mathbf{D}\) (default identity):
+For width $W$, height $H$, spacing $\mathbf{s} = (s_i, s_j)$, origin $\mathbf{o}$
+(physical location of index $(0,0)$), and $2 \times 2$ direction matrix $\mathbf{D}$
+(default identity).
 
-\[
-\begin{aligned}
-\mathbf{p} &= \mathbf{o} + \mathbf{D}\,
-\begin{pmatrix} s_i\, i \\ s_j\, j \end{pmatrix}
-&& \text{(index \(\to\) physical)} \\[0.5em]
-\begin{pmatrix} i \\ j \end{pmatrix}
-&=
-\begin{pmatrix} 1/s_i & 0 \\ 0 & 1/s_j \end{pmatrix}
-\mathbf{D}^{-1}\,(\mathbf{p} - \mathbf{o})
-&& \text{(physical \(\to\) continuous index)}
-\end{aligned}
-\]
+**Index to physical:**
 
-`Image2D` stores intensities \(I(i,j)\) in **row-major** order:
+$$
+\mathbf{p} = \mathbf{o} + \mathbf{D}
+\begin{pmatrix}
+s_i \, i \\
+s_j \, j
+\end{pmatrix}
+$$
 
-\[
-\text{linearIndex} = j\, W + i,\qquad i \in \{0,\ldots,W-1\},\; j \in \{0,\ldots,H-1\}.
-\]
+**Physical to continuous index:**
+
+$$
+\begin{pmatrix}
+i \\
+j
+\end{pmatrix}
+=
+\begin{pmatrix}
+1/s_i & 0 \\
+0 & 1/s_j
+\end{pmatrix}
+\mathbf{D}^{-1} (\mathbf{p} - \mathbf{o})
+$$
+
+`Image2D` stores intensities $I(i,j)$ in **row-major** order:
+
+$$
+\mathrm{linearIndex} = j \, W + i, \quad i \in \{0,\ldots,W-1\}, \; j \in \{0,\ldots,H-1\}
+$$
 
 ### Transforms (`Transform2D`)
 
-A transform maps a physical point \(\mathbf{p}\) to \(\mathbf{p}' = T(\mathbf{p})\).
+A transform maps a physical point $\mathbf{p}$ to $\mathbf{p}' = T(\mathbf{p})$.
 
-| Type | Formula |
-|------|---------|
-| **Translation2D** | \(\mathbf{p}' = \mathbf{p} + \mathbf{t}\) |
-| **Rigid2D** | \(\mathbf{p}' = \mathbf{R}(\theta)\,\mathbf{p} + \mathbf{t}\), where \(\mathbf{R}(\theta)=\begin{pmatrix}\cos\theta & -\sin\theta\\ \sin\theta & \cos\theta\end{pmatrix}\) |
+**Translation2D**
 
-Direction locked for resampling: \(T\) maps **fixed physical \(\to\) moving physical**.
+$$
+\mathbf{p}' = \mathbf{p} + \mathbf{t}
+$$
+
+**Rigid2D** (rotation then translation about the physical origin)
+
+$$
+\mathbf{R}(\theta) =
+\begin{pmatrix}
+\cos\theta & -\sin\theta \\
+\sin\theta & \cos\theta
+\end{pmatrix},
+\qquad
+\mathbf{p}' = \mathbf{R}(\theta) \, \mathbf{p} + \mathbf{t}
+$$
+
+For resampling, $T$ maps **fixed physical → moving physical**.
 
 ### Interpolation (`Interpolator2D`)
 
-Sample continuous index \(\mathbf{u} = (u, v)\) on image \(I\).
+Sample continuous index $\mathbf{u} = (u, v)$ on image $I$.
 
 **Nearest neighbor**
 
-\[
-I_{\mathrm{NN}}(\mathbf{u}) = I\!\left(\mathrm{round}(u),\, \mathrm{round}(v)\right)
-\]
+$$
+I_{\mathrm{NN}}(\mathbf{u}) = I\bigl(\mathrm{round}(u),\, \mathrm{round}(v)\bigr)
+$$
 
-(with out-of-bounds handled by `BoundsPolicy`: constant fill or clamp to the lattice).
+Out-of-bounds samples use `BoundsPolicy` (constant fill or clamp to the lattice).
 
 **Bilinear** (`LinearInterpolator2D`)
 
-Let \(i_0 = \lfloor u\rfloor\), \(j_0 = \lfloor v\rfloor\), \(f_x = u - i_0\), \(f_y = v - j_0\), and \(I_{00}, I_{10}, I_{01}, I_{11}\) the four corner samples (via the same bounds policy):
+Let $i_0 = \lfloor u \rfloor$, $j_0 = \lfloor v \rfloor$, $f_x = u - i_0$,
+$f_y = v - j_0$, and $I_{00}, I_{10}, I_{01}, I_{11}$ the four corner samples:
 
-\[
+$$
 \begin{aligned}
 I_{\mathrm{lin}}(\mathbf{u})
 &= (1-f_x)(1-f_y)\, I_{00}
  + f_x(1-f_y)\, I_{10} \\
 &\quad + (1-f_x)f_y\, I_{01}
- + f_x f_y\, I_{11}.
+ + f_x f_y\, I_{11}
 \end{aligned}
-\]
+$$
 
 ### Resampling (`ImageResampler2D`)
 
-Build output \(I_{\mathrm{out}}\) on fixed geometry \(G_f\). For each integer fixed index \((i,j)\):
+Build output $I_{\mathrm{out}}$ on fixed geometry $G_f$. For each integer fixed
+index $(i,j)$:
 
-\[
+$$
 \begin{aligned}
-\mathbf{p}_f &= G_f.\mathrm{indexToPhysical}(i,j) \\
+\mathbf{p}_f &= \mathrm{indexToPhysical}_{G_f}(i, j) \\
 \mathbf{p}_m &= T(\mathbf{p}_f) \\
-\mathbf{u}_m &= G_m.\mathrm{physicalToIndex}(\mathbf{p}_m) \\
+\mathbf{u}_m &= \mathrm{physicalToIndex}_{G_m}(\mathbf{p}_m) \\
 I_{\mathrm{out}}(i,j) &= \mathrm{Interp}(I_m,\, \mathbf{u}_m)
 \end{aligned}
-\]
+$$
 
 This is **inverse (pull) warping**: iterate the fixed grid, sample the moving image.
 
 ### Metric (`MeanSquaresMetric2D`)
 
-For same-size images \(I_f\) and \(I_m\) with \(N = W H\) pixels:
+For same-size images $I_f$ and $I_m$ with $N = W H$ pixels:
 
-\[
+$$
 \mathrm{MSE}(I_f, I_m)
-= \frac{1}{N}\sum_{i,j}\bigl(I_f(i,j) - I_m(i,j)\bigr)^2.
-\]
+= \frac{1}{N} \sum_{i,j} \bigl( I_f(i,j) - I_m(i,j) \bigr)^2
+$$
 
 `isMinimize()` is true (lower is better).
 
 ### Registration result
 
-`RegistrationResult` is a **solve summary** (not a cost functional): success flag, `ErrorCode`, final metric value, iteration count, optional message. Full registration optimization is still planned.
+`RegistrationResult` is a **solve summary** (not a cost functional): success flag,
+`ErrorCode`, final metric value, iteration count, optional message. Full registration
+optimization is still planned.
 
 ## Architecture
 
