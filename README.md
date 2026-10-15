@@ -25,7 +25,7 @@ Fixed image + moving image
   transform + interpolator + resampler + metric (+ optimizer)
         │
         ▼
-  RegistrationResult (success, transform, metric value, …)
+  RegistrationResult (success, metric, iterations, …)
 ```
 
 ## Current status
@@ -40,22 +40,117 @@ Fixed image + moving image
 | `Metric2D`, `MeanSquaresMetric2D` | Done |
 | `Resampler2D`, `ImageResampler2D` | Done |
 | Optional PNG write (`ir::io`) | Done |
-| Synthetic translation example | Done (this branch) |
+| Synthetic translation example | Done |
+| `RegistrationResult`, `ErrorCode` | Done |
 | Optimizer / full registration method | Planned (see `docs/plan/`) |
 | 3D / time-series | Future |
+
+## Mathematical formulation (implemented)
+
+Notation uses continuous **index** coordinates \((i, j)\) and **physical** coordinates \((x, y)\). Integer lattice sites are **pixel centers**. See [coordinate conventions](docs/architecture/coordinate-conventions.md).
+
+### Geometry
+
+For width \(W\), height \(H\), spacing \(\mathbf{s} = (s_i, s_j)\), origin \(\mathbf{o}\) (physical location of index \((0,0)\)), and \(2\times 2\) direction matrix \(\mathbf{D}\) (default identity):
+
+\[
+\begin{aligned}
+\mathbf{p} &= \mathbf{o} + \mathbf{D}\,
+\begin{pmatrix} s_i\, i \\ s_j\, j \end{pmatrix}
+&& \text{(index \(\to\) physical)} \\[0.5em]
+\begin{pmatrix} i \\ j \end{pmatrix}
+&=
+\begin{pmatrix} 1/s_i & 0 \\ 0 & 1/s_j \end{pmatrix}
+\mathbf{D}^{-1}\,(\mathbf{p} - \mathbf{o})
+&& \text{(physical \(\to\) continuous index)}
+\end{aligned}
+\]
+
+`Image2D` stores intensities \(I(i,j)\) in **row-major** order:
+
+\[
+\text{linearIndex} = j\, W + i,\qquad i \in \{0,\ldots,W-1\},\; j \in \{0,\ldots,H-1\}.
+\]
+
+### Transforms (`Transform2D`)
+
+A transform maps a physical point \(\mathbf{p}\) to \(\mathbf{p}' = T(\mathbf{p})\).
+
+| Type | Formula |
+|------|---------|
+| **Translation2D** | \(\mathbf{p}' = \mathbf{p} + \mathbf{t}\) |
+| **Rigid2D** | \(\mathbf{p}' = \mathbf{R}(\theta)\,\mathbf{p} + \mathbf{t}\), where \(\mathbf{R}(\theta)=\begin{pmatrix}\cos\theta & -\sin\theta\\ \sin\theta & \cos\theta\end{pmatrix}\) |
+
+Direction locked for resampling: \(T\) maps **fixed physical \(\to\) moving physical**.
+
+### Interpolation (`Interpolator2D`)
+
+Sample continuous index \(\mathbf{u} = (u, v)\) on image \(I\).
+
+**Nearest neighbor**
+
+\[
+I_{\mathrm{NN}}(\mathbf{u}) = I\!\left(\mathrm{round}(u),\, \mathrm{round}(v)\right)
+\]
+
+(with out-of-bounds handled by `BoundsPolicy`: constant fill or clamp to the lattice).
+
+**Bilinear** (`LinearInterpolator2D`)
+
+Let \(i_0 = \lfloor u\rfloor\), \(j_0 = \lfloor v\rfloor\), \(f_x = u - i_0\), \(f_y = v - j_0\), and \(I_{00}, I_{10}, I_{01}, I_{11}\) the four corner samples (via the same bounds policy):
+
+\[
+\begin{aligned}
+I_{\mathrm{lin}}(\mathbf{u})
+&= (1-f_x)(1-f_y)\, I_{00}
+ + f_x(1-f_y)\, I_{10} \\
+&\quad + (1-f_x)f_y\, I_{01}
+ + f_x f_y\, I_{11}.
+\end{aligned}
+\]
+
+### Resampling (`ImageResampler2D`)
+
+Build output \(I_{\mathrm{out}}\) on fixed geometry \(G_f\). For each integer fixed index \((i,j)\):
+
+\[
+\begin{aligned}
+\mathbf{p}_f &= G_f.\mathrm{indexToPhysical}(i,j) \\
+\mathbf{p}_m &= T(\mathbf{p}_f) \\
+\mathbf{u}_m &= G_m.\mathrm{physicalToIndex}(\mathbf{p}_m) \\
+I_{\mathrm{out}}(i,j) &= \mathrm{Interp}(I_m,\, \mathbf{u}_m)
+\end{aligned}
+\]
+
+This is **inverse (pull) warping**: iterate the fixed grid, sample the moving image.
+
+### Metric (`MeanSquaresMetric2D`)
+
+For same-size images \(I_f\) and \(I_m\) with \(N = W H\) pixels:
+
+\[
+\mathrm{MSE}(I_f, I_m)
+= \frac{1}{N}\sum_{i,j}\bigl(I_f(i,j) - I_m(i,j)\bigr)^2.
+\]
+
+`isMinimize()` is true (lower is better).
+
+### Registration result
+
+`RegistrationResult` is a **solve summary** (not a cost functional): success flag, `ErrorCode`, final metric value, iteration count, optional message. Full registration optimization is still planned.
 
 ## Architecture
 
 | Component | Role |
 |-----------|------|
-| **core** | Points, image geometry, images |
+| **core** | Points, image geometry, images, `ErrorCode` |
 | **transform** | Translation, rigid, … |
 | **interpolator** | Sample at continuous indices |
 | **metric** | Similarity / dissimilarity |
 | **resampler** | Warp moving image onto fixed geometry |
+| **registration** | `RegistrationResult` (method/orchestrator planned) |
 | **io** | Optional export (PNG) |
 | **optimizer** | Parameter search (planned) |
-| **registration** | Orchestrate a full run (planned) |
 
 Public API: `include/ir/`. Tests: `tests/`. Plan and ADRs: `docs/plan/`.
 
@@ -129,7 +224,7 @@ Source: `examples/synthetic_translation/main.cpp`.
 ## Layout
 
 ```text
-include/ir/          Public headers (core, transform, interpolator, metric, resampler, io)
+include/ir/          Public headers (core, transform, interpolator, metric, resampler, registration, io)
 examples/            Runnable demos (enable with IR_BUILD_EXAMPLES)
 tests/               Catch2 tests
 docs/plan/           Vision, backlog, ADRs, implemented notes
