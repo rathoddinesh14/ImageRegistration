@@ -18,11 +18,11 @@ endif()
 find_package(Eigen3 3.3 QUIET NO_MODULE)
 if(NOT Eigen3_FOUND)
   include(FetchContent)
+  # Prefer release archive over git clone (GitLab git endpoint is often rate-limited).
   FetchContent_Declare(
     Eigen
-    GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
-    GIT_TAG        3.4.0
-    GIT_SHALLOW    TRUE
+    URL https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   )
   set(EIGEN_BUILD_DOC OFF CACHE BOOL "" FORCE)
   set(EIGEN_BUILD_TESTING OFF CACHE BOOL "" FORCE)

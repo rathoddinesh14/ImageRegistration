@@ -53,7 +53,7 @@ jobs:
       - name: Install clang-tidy
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-tidy-17 cmake ninja-build
+          sudo apt-get install -y clang-tidy-17 cmake ninja-build libeigen3-dev
 
       - name: Configure with compile_commands
         run: |
@@ -95,6 +95,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install Eigen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libeigen3-dev
 
       - name: Configure (CMake)
         run: |

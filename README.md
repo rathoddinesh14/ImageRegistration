@@ -25,7 +25,7 @@ Fixed image + moving image
   transform + interpolator + resampler + metric (+ optimizer)
         │
         ▼
-  RegistrationResult (success, transform, metric value, …)
+  RegistrationResult (success, metric, iterations, …)
 ```
 
 ## Current status
@@ -40,22 +40,168 @@ Fixed image + moving image
 | `Metric2D`, `MeanSquaresMetric2D` | Done |
 | `Resampler2D`, `ImageResampler2D` | Done |
 | Optional PNG write (`ir::io`) | Done |
-| Synthetic translation example | Done (this branch) |
+| Synthetic translation example | Done |
+| `RegistrationResult`, `ErrorCode` | Done |
 | Optimizer / full registration method | Planned (see `docs/plan/`) |
 | 3D / time-series | Future |
+
+## Mathematical formulation (implemented)
+
+Notation:
+
+- continuous **index** coordinates $(i, j)$
+- **physical** coordinates $(x, y)$
+- integer lattice sites are **pixel centers**
+
+Details: [coordinate conventions](docs/architecture/coordinate-conventions.md).
+
+### Geometry
+
+Width $W$, height $H$, spacing $\mathbf{s}=(s_i,s_j)$, origin $\mathbf{o}$, direction $\mathbf{D}$ (default identity).
+
+**Index to physical**
+
+```math
+\mathbf{p}
+=
+\mathbf{o}
++
+\mathbf{D}
+\begin{pmatrix}
+s_i\, i \\
+s_j\, j
+\end{pmatrix}
+```
+
+**Physical to continuous index**
+
+```math
+\begin{pmatrix}
+i \\
+j
+\end{pmatrix}
+=
+\begin{pmatrix}
+1/s_i & 0 \\
+0 & 1/s_j
+\end{pmatrix}
+\mathbf{D}^{-1}
+(\mathbf{p}-\mathbf{o})
+```
+
+`Image2D` is **row-major**:
+
+```math
+\mathrm{linearIndex}
+=
+j\,W + i,
+\qquad
+i\in\{0,\ldots,W-1\},\;
+j\in\{0,\ldots,H-1\}
+```
+
+### Transforms (`Transform2D`)
+
+Map physical $\mathbf{p}$ to $\mathbf{p}'=T(\mathbf{p})$.
+
+**Translation2D**
+
+```math
+\mathbf{p}' = \mathbf{p} + \mathbf{t}
+```
+
+**Rigid2D** (rotate about the physical origin, then translate)
+
+```math
+\mathbf{R}(\theta)
+=
+\begin{pmatrix}
+\cos\theta & -\sin\theta \\
+\sin\theta & \cos\theta
+\end{pmatrix}
+```
+
+```math
+\mathbf{p}' = \mathbf{R}(\theta)\,\mathbf{p} + \mathbf{t}
+```
+
+Resampling uses $T$: **fixed physical → moving physical**.
+
+### Interpolation (`Interpolator2D`)
+
+Sample continuous index $\mathbf{u}=(u,v)$ on image $I$.
+
+**Nearest neighbor**
+
+```math
+I_{\mathrm{NN}}(\mathbf{u})
+=
+I\bigl(\mathrm{round}(u),\,\mathrm{round}(v)\bigr)
+```
+
+Out-of-bounds: `BoundsPolicy` (constant fill or clamp).
+
+**Bilinear** (`LinearInterpolator2D`)
+
+With $i_0=\lfloor u\rfloor$, $j_0=\lfloor v\rfloor$, $f_x=u-i_0$, $f_y=v-j_0$, and corner samples $I_{00},I_{10},I_{01},I_{11}$:
+
+```math
+\begin{aligned}
+I_{\mathrm{lin}}(\mathbf{u})
+&=
+(1-f_x)(1-f_y)\,I_{00}
++
+f_x(1-f_y)\,I_{10}
+\\
+&\quad
++
+(1-f_x)f_y\,I_{01}
++
+f_x f_y\,I_{11}
+\end{aligned}
+```
+
+### Resampling (`ImageResampler2D`)
+
+Pull warping onto fixed geometry $G_f$. For each integer fixed index $(i,j)$:
+
+```math
+\begin{aligned}
+\mathbf{p}_f &= \mathrm{indexToPhysical}_{G_f}(i,j) \\
+\mathbf{p}_m &= T(\mathbf{p}_f) \\
+\mathbf{u}_m &= \mathrm{physicalToIndex}_{G_m}(\mathbf{p}_m) \\
+I_{\mathrm{out}}(i,j) &= \mathrm{Interp}(I_m,\mathbf{u}_m)
+\end{aligned}
+```
+
+### Metric (`MeanSquaresMetric2D`)
+
+Same-size images $I_f$, $I_m$ with $N=WH$ pixels; minimize:
+
+```math
+\mathrm{MSE}(I_f,I_m)
+=
+\frac{1}{N}
+\sum_{i,j}
+\bigl(I_f(i,j)-I_m(i,j)\bigr)^2
+```
+
+### Registration result
+
+`RegistrationResult` is a **solve summary** (not a cost): success flag, `ErrorCode`, final metric, iterations, optional message. Full registration optimization is still planned.
 
 ## Architecture
 
 | Component | Role |
 |-----------|------|
-| **core** | Points, image geometry, images |
+| **core** | Points, image geometry, images, `ErrorCode` |
 | **transform** | Translation, rigid, … |
 | **interpolator** | Sample at continuous indices |
 | **metric** | Similarity / dissimilarity |
 | **resampler** | Warp moving image onto fixed geometry |
+| **registration** | `RegistrationResult` (method/orchestrator planned) |
 | **io** | Optional export (PNG) |
 | **optimizer** | Parameter search (planned) |
-| **registration** | Orchestrate a full run (planned) |
 
 Public API: `include/ir/`. Tests: `tests/`. Plan and ADRs: `docs/plan/`.
 
@@ -129,7 +275,7 @@ Source: `examples/synthetic_translation/main.cpp`.
 ## Layout
 
 ```text
-include/ir/          Public headers (core, transform, interpolator, metric, resampler, io)
+include/ir/          Public headers (core, transform, interpolator, metric, resampler, registration, io)
 examples/            Runnable demos (enable with IR_BUILD_EXAMPLES)
 tests/               Catch2 tests
 docs/plan/           Vision, backlog, ADRs, implemented notes

@@ -1,6 +1,6 @@
 # Task: Error codes and Error type
 
-**Status**: todo  
+**Status**: partial — `ErrorCode` enum delivered with RegistrationResult; `Error` class still todo  
 **Component**: core / infrastructure  
 **Priority**: Medium (with or right after `ir::Expected`)
 
