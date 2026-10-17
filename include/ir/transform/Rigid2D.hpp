@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include <ir/core/Point2D.hpp>
-#include <ir/transform/Transform2D.hpp>
+#include <ir/transform/ParametricTransform2D.hpp>
 
 namespace ir {
 
@@ -15,10 +15,15 @@ namespace ir {
  *   [ cos(theta)  -sin(theta) ]
  *   [ sin(theta)   cos(theta) ]
  *
+ * Parameter vector (numberOfParameters() == 3):
+ *   [0] = angle in radians (theta)
+ *   [1] = translation.x (tx)
+ *   [2] = translation.y (ty)
+ *
  * Angle is in radians. isInvertible() is always true; materializing the inverse
  * object is deferred until ir::Expected is available.
  */
-class Rigid2D final : public Transform2D {
+class Rigid2D final : public ParametricTransform2D {
 public:
     /** Identity: zero angle and zero translation. */
     Rigid2D() noexcept = default;
@@ -55,6 +60,28 @@ public:
      * @return Always true.
      */
     [[nodiscard]] bool isInvertible() const noexcept override { return true; }
+
+    /** @return Always 3 (theta, tx, ty). */
+    [[nodiscard]] int numberOfParameters() const override { return 3; }
+
+    /**
+     * Write [theta, tx, ty] into parameters.
+     * @param parameters Output length 3.
+     */
+    void getParameters(double* parameters) const override {
+        parameters[0] = m_angle;
+        parameters[1] = m_translation.x();
+        parameters[2] = m_translation.y();
+    }
+
+    /**
+     * Set angle and translation from [theta, tx, ty].
+     * @param parameters Input length 3.
+     */
+    void setParameters(const double* parameters) override {
+        m_angle = parameters[0];
+        m_translation = Point2D{parameters[1], parameters[2]};
+    }
 
 private:
     double m_angle = 0.0;
