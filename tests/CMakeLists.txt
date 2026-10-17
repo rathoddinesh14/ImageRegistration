@@ -9,6 +9,7 @@ add_executable(ir_tests
   transform/test_transform2d.cpp
   transform/test_translation2d.cpp
   transform/test_rigid2d.cpp
+  transform/test_parametric_transform2d.cpp
   interpolator/test_interpolator2d.cpp
   interpolator/test_nearest_neighbor2d.cpp
   interpolator/test_linear_interpolator2d.cpp
