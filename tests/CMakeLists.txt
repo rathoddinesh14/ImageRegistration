@@ -18,6 +18,7 @@ add_executable(ir_tests
   resampler/test_image_resampler2d.cpp
   registration/test_registration_result.cpp
   registration/test_registration2d.cpp
+  optimizer/test_optimizer.cpp
 )
 
 target_link_libraries(ir_tests
