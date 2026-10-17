@@ -32,7 +32,8 @@ public:
      *        cost.numberOfParameters(). Updated in place on success.
      * @return Solve summary; finalMetric is the final cost value.
      */
-    [[nodiscard]] virtual RegistrationResult optimize(const CostFunction& cost, double* parameters) const = 0;
+    [[nodiscard]] virtual RegistrationResult optimize(const CostFunction& cost,
+                                                      double* parameters) const = 0;
 
 protected:
     Optimizer() = default;
