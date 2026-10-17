@@ -1,17 +1,16 @@
 # Task: Optimizer pure interface
 
-**Status**: todo  
+**Status**: done (branch `feature/optimizer-interface`)  
 **Component**: optimizer  
 **Priority**: Medium  
-**Depends on**: parametric transform interface (recommended)
 
-## Goal
-Abstract iterative parameter updates for registration (no Ceres dependency in core).
-
-## Draft API
-- Configure max iterations, step size, tolerance
-- `optimize(cost function or registration callback)` — keep minimal and document
+## Design locked
+- `CostFunction`: numberOfParameters(), value(const double*)
+- `Optimizer::optimize(cost, parameters) → RegistrationResult`
+- Parameters caller-owned in/out; config on concrete types
+- No production algorithm in this task
 
 ## Acceptance criteria
-- [ ] Header under `include/ir/optimizer/`
-- [ ] Documented lifecycle; no concrete algorithm required in this task
+- [x] Headers under `include/ir/optimizer/`
+- [x] Documented lifecycle
+- [x] Stub Catch2 tests
