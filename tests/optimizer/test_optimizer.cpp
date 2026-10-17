@@ -2,10 +2,8 @@
 #include <ir/optimizer/CostFunction.hpp>
 #include <ir/optimizer/Optimizer.hpp>
 #include <ir/registration/RegistrationResult.hpp>
-#include <cmath>
 #include <memory>
 #include <type_traits>
-#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
@@ -27,13 +25,12 @@ public:
     }
 };
 
-/** Test-only: copies nothing; reports success with cost at current params. */
+/** Test-only: reports success with cost at current params. */
 class IdentityOptimizerStub final : public ir::Optimizer {
 public:
     [[nodiscard]] ir::RegistrationResult optimize(const ir::CostFunction& cost,
                                                   double* parameters) const override {
-        const double v = cost.value(parameters);
-        return ir::RegistrationResult::success(v, 0);
+        return ir::RegistrationResult::success(cost.value(parameters), 0);
     }
 };
 
