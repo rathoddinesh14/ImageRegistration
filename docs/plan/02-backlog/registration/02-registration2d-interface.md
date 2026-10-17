@@ -1,14 +1,15 @@
 # Task: Registration2D / method interface
 
-**Status**: todo  
+**Status**: done (branch `feature/registration2d-interface`)  
 **Component**: registration  
 **Priority**: Medium  
-**Depends on**: Metric, Resampler, Optimizer, RegistrationResult
 
-## Goal
-Pure (or thin) interface for running 2D image registration: fixed + moving + transform → result.
+## Design locked
+- `run(fixed, moving, transform) → RegistrationResult`
+- Transform is caller-owned in/out (fixed physical → moving physical)
+- No production algorithm in this task
 
 ## Acceptance criteria
-- [ ] Header under `include/ir/registration/`
-- [ ] Inputs/outputs documented (ownership of transform)
-- [ ] No full algorithm required in this task
+- [x] `include/ir/registration/Registration2D.hpp`
+- [x] Inputs/outputs documented
+- [x] Stub Catch2 tests
