@@ -40,11 +40,10 @@ public:
      * @param shrinkFactor Multiply step on failure (default 0.5).
      * @param differenceEpsilon Central-difference half-step (default 1e-6).
      */
-    explicit RegularStepGradientDescent(int maxIterations = 100, double learningRate = 0.1,
-                                        double gradientTolerance = 1e-6, double minStep = 1e-8,
-                                        double maxStep = 1.0, double relaxationFactor = 1.1,
-                                        double shrinkFactor = 0.5,
-                                        double differenceEpsilon = 1e-6) noexcept
+    explicit RegularStepGradientDescent(
+        int maxIterations = 100, double learningRate = 0.1, double gradientTolerance = 1e-6,
+        double minStep = 1e-8, double maxStep = 1.0, double relaxationFactor = 1.1,
+        double shrinkFactor = 0.5, double differenceEpsilon = 1e-6) noexcept
         : m_maxIterations(maxIterations), m_learningRate(learningRate),
           m_gradientTolerance(gradientTolerance), m_minStep(minStep), m_maxStep(maxStep),
           m_relaxationFactor(relaxationFactor), m_shrinkFactor(shrinkFactor),

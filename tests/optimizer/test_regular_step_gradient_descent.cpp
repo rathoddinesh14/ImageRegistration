@@ -1,9 +1,9 @@
+#include <cmath>
 #include <ir/core/ErrorCode.hpp>
 #include <ir/optimizer/CostFunction.hpp>
 #include <ir/optimizer/Optimizer.hpp>
 #include <ir/optimizer/RegularStepGradientDescent.hpp>
 #include <ir/registration/RegistrationResult.hpp>
-#include <cmath>
 #include <limits>
 #include <memory>
 #include <type_traits>
@@ -50,15 +50,13 @@ public:
 
 } // namespace
 
-TEST_CASE("RegularStepGradientDescent is a concrete Optimizer",
-          "[optimizer][RegularStepGradientDescent]") {
+TEST_CASE("RSGD is a concrete Optimizer", "[optimizer][RegularStepGradientDescent]") {
     STATIC_REQUIRE(std::is_base_of_v<ir::Optimizer, ir::RegularStepGradientDescent>);
     STATIC_REQUIRE(std::is_final_v<ir::RegularStepGradientDescent>);
     STATIC_REQUIRE(!std::is_abstract_v<ir::RegularStepGradientDescent>);
 }
 
-TEST_CASE("RegularStepGradientDescent minimizes 1D quadratic",
-          "[optimizer][RegularStepGradientDescent]") {
+TEST_CASE("RSGD minimizes 1D quadratic", "[optimizer][RegularStepGradientDescent]") {
     const Quadratic1D cost;
     double p[] = {5.0};
     const ir::RegularStepGradientDescent opt{200, 0.2};
@@ -72,8 +70,7 @@ TEST_CASE("RegularStepGradientDescent minimizes 1D quadratic",
     REQUIRE(r.iterations >= 1);
 }
 
-TEST_CASE("RegularStepGradientDescent minimizes 2D quadratic",
-          "[optimizer][RegularStepGradientDescent]") {
+TEST_CASE("RSGD minimizes 2D quadratic", "[optimizer][RegularStepGradientDescent]") {
     const Quadratic2D cost;
     double p[] = {4.0, 3.0};
     const ir::RegularStepGradientDescent opt{300, 0.15};
@@ -86,8 +83,7 @@ TEST_CASE("RegularStepGradientDescent minimizes 2D quadratic",
     REQUIRE_THAT(p[1], WithinAbs(-2.0, 1e-2));
 }
 
-TEST_CASE("RegularStepGradientDescent fails on non-finite cost",
-          "[optimizer][RegularStepGradientDescent]") {
+TEST_CASE("RSGD fails on non-finite cost", "[optimizer][RegularStepGradientDescent]") {
     const NanCost cost;
     double p[] = {0.0};
     const ir::RegularStepGradientDescent opt;
@@ -98,8 +94,7 @@ TEST_CASE("RegularStepGradientDescent fails on non-finite cost",
     REQUIRE(r.code == ir::ErrorCode::NonFiniteMetric);
 }
 
-TEST_CASE("RegularStepGradientDescent works through Optimizer base",
-          "[optimizer][RegularStepGradientDescent]") {
+TEST_CASE("RSGD works through Optimizer base", "[optimizer][RegularStepGradientDescent]") {
     const Quadratic1D cost;
     double p[] = {0.0};
     const ir::RegularStepGradientDescent concrete{150, 0.25};
