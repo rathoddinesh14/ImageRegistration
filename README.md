@@ -42,8 +42,44 @@ Fixed image + moving image
 | Optional PNG write (`ir::io`) | Done |
 | Synthetic translation example | Done |
 | `RegistrationResult`, `ErrorCode` | Done |
-| Optimizer / full registration method | Planned (see `docs/plan/`) |
+| `ParametricTransform2D` | Done |
+| `CostFunction`, `Optimizer` | Done |
+| `RegularStepGradientDescent` | Done (finite-difference; see Limitations) |
+| Full `ImageRegistrationMethod2D` | Planned (see `docs/plan/`) |
 | 3D / time-series | Future |
+
+## Limitations (current implementation)
+
+This is an early, intentionally minimal stack. Know what is **not** claimed yet.
+
+### Scope
+- **2D only** — no 3D volumes or time-series sequences yet.
+- **No end-to-end registration method** — interfaces and pieces exist; a concrete
+  `ImageRegistrationMethod2D` that wires resampler + metric + optimizer is still
+  planned.
+- **Transforms** — translation and rigid (SE(2)); no affine/deformable models yet.
+- **Metrics** — mean squares only; no mutual information / NCC / etc.
+- **IO** — optional PNG write; no general reader, DICOM, or multi-format facade yet.
+
+### Optimizer (`RegularStepGradientDescent`)
+- **Value-only costs** — gradient is **central finite differences** on
+  `CostFunction::value`; no analytic derivatives.
+- **Not Ceres / ITK production quality** — simple regular step (grow on success,
+  shrink on failure); no trust region, L-BFGS, or robust line search.
+- **Best suited to smooth, roughly convex toy problems** and small-parameter
+  demos (e.g. Translation2D). Noisy image metrics and large parameter spaces
+  may stall or need careful step tuning.
+- **Cost per iteration** grows with parameter count (2 function evaluations per
+  parameter for the gradient).
+
+### Numerical / API
+- Parameter buffers are **caller-owned**; wrong length is undefined behavior
+  (same contract as `CostFunction`).
+- **No multi-resolution / pyramid** schedule yet.
+- **Error handling** is hybrid (`ErrorCode` / `RegistrationResult`); full
+  `ir::Expected` is still backlog.
+- Pixel-center geometry and fixed→moving transform direction are fixed conventions;
+  see [coordinate conventions](docs/architecture/coordinate-conventions.md).
 
 ## Mathematical formulation (implemented)
 

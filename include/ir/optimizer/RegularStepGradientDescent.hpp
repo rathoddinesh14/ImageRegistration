@@ -12,21 +12,21 @@ namespace ir {
 /**
  * Regular-step gradient descent using central finite differences.
  *
- * Not a production Ceres-quality solver: gradient is approximated from
- * CostFunction::value only; no analytic derivatives, line search is a simple
- * shrink-on-failure step. Sufficient for convex toy costs and Translation2D
- * demos.
- *
  * Each iteration:
  * 1. Estimate gradient g by central differences with epsilon.
  * 2. Propose p <- p - stepLength * g (raw gradient scale).
  * 3. If cost improves, accept and optionally grow stepLength (up to maxStep).
- * 4. Otherwise shrink stepLength and retry without advancing the iteration
- *    counter beyond maxIterations budget of successful attempts... (v0.1:
- *    shrink and re-evaluate within the same iteration up to a small limit).
+ * 4. Otherwise shrink stepLength and retry (up to a small attempt limit).
  *
  * Stops when gradient L2 norm is below gradientTolerance, stepLength falls
  * below minStep, maxIterations is reached, or a non-finite cost is seen.
+ *
+ * Limitations (v0.1):
+ * - Not a production Ceres/ITK-quality solver.
+ * - Gradients from CostFunction::value only (no analytic derivatives).
+ * - Simple regular step; no trust region or advanced line search.
+ * - Aimed at smooth/convex toy costs and small demos (e.g. Translation2D).
+ * - Cost scales with parameter count (2 evaluations per parameter per gradient).
  */
 class RegularStepGradientDescent final : public Optimizer {
 public:
