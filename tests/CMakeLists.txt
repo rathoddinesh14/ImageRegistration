@@ -20,6 +20,7 @@ add_executable(ir_tests
   registration/test_registration_result.cpp
   registration/test_registration2d.cpp
   optimizer/test_optimizer.cpp
+  optimizer/test_regular_step_gradient_descent.cpp
 )
 
 target_link_libraries(ir_tests
