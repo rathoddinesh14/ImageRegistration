@@ -45,7 +45,8 @@ Fixed image + moving image
 | `ParametricTransform2D` | Done |
 | `CostFunction`, `Optimizer` | Done |
 | `RegularStepGradientDescent` | Done (finite-difference; see Limitations) |
-| Full `ImageRegistrationMethod2D` | Planned (see `docs/plan/`) |
+| `ImageRegistrationMethod2D` | Done |
+| End-to-end translation example | Done |
 | 3D / time-series | Future |
 
 ## Limitations (current implementation)
@@ -54,9 +55,8 @@ This is an early, intentionally minimal stack. Know what is **not** claimed yet.
 
 ### Scope
 - **2D only** — no 3D volumes or time-series sequences yet.
-- **No end-to-end registration method** — interfaces and pieces exist; a concrete
-  `ImageRegistrationMethod2D` that wires resampler + metric + optimizer is still
-  planned.
+- **End-to-end method is minimal** — `ImageRegistrationMethod2D` wires resampler +
+  metric + optimizer for parametric transforms; no multi-resolution or robust metrics.
 - **Transforms** — translation and rigid (SE(2)); no affine/deformable models yet.
 - **Metrics** — mean squares only; no mutual information / NCC / etc.
 - **IO** — optional PNG write; no general reader, DICOM, or multi-format facade yet.
@@ -80,6 +80,21 @@ This is an early, intentionally minimal stack. Know what is **not** claimed yet.
   `ir::Expected` is still backlog.
 - Pixel-center geometry and fixed→moving transform direction are fixed conventions;
   see [coordinate conventions](docs/architecture/coordinate-conventions.md).
+
+## Examples
+
+Enable with `-DIR_BUILD_EXAMPLES=ON`.
+
+| Example | What it shows |
+|---------|----------------|
+| `synthetic_translation` | Known shift → resample → MSE drop (optional PNG) |
+| `register_translation` | **Full registration**: GD recovers a known translation |
+
+```bash
+cmake -S . -B build -DIR_BUILD_EXAMPLES=ON -DIR_BUILD_TESTS=ON
+cmake --build build
+./build/examples/register_translation/ir_example_register_translation
+```
 
 ## Mathematical formulation (implemented)
 

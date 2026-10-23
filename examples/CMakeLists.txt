@@ -18,3 +18,16 @@ endif()
 set_target_properties(ir_example_synthetic_translation PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/synthetic_translation"
 )
+
+add_executable(ir_example_register_translation
+  register_translation/main.cpp
+)
+
+target_link_libraries(ir_example_register_translation
+  PRIVATE
+    ir::ImageRegistration
+)
+
+set_target_properties(ir_example_register_translation PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/register_translation"
+)

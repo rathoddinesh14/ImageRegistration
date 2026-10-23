@@ -1,8 +1,9 @@
+#include <cmath>
 #include <ir/core/ErrorCode.hpp>
 #include <ir/core/Image2D.hpp>
 #include <ir/core/ImageGeometry2D.hpp>
 #include <ir/core/Point2D.hpp>
-#include <ir/interpolator/NearestNeighborInterpolator2D.hpp>
+#include <ir/interpolator/LinearInterpolator2D.hpp>
 #include <ir/metric/MeanSquaresMetric2D.hpp>
 #include <ir/optimizer/RegularStepGradientDescent.hpp>
 #include <ir/registration/ImageRegistrationMethod2D.hpp>
@@ -25,23 +26,20 @@ namespace {
     return ir::ImageGeometry2D{w, h, ir::Point2D{1.0, 1.0}, ir::Point2D{0.0, 0.0}};
 }
 
-/** Disk of value 1.0; background 0. */
-[[nodiscard]] ir::Image2D makeDisk(int w, int h, double cx, double cy, double radius) {
+/** Smooth Gaussian blob (differentiable enough for finite-difference GD). */
+[[nodiscard]] ir::Image2D makeBlob(int w, int h, double cx, double cy, double sigma) {
     ir::Image2D image{makeGeom(w, h)};
-    const double r2 = radius * radius;
+    const double inv = 1.0 / (2.0 * sigma * sigma);
     for (int j = 0; j < h; ++j) {
         for (int i = 0; i < w; ++i) {
             const double dx = static_cast<double>(i) - cx;
             const double dy = static_cast<double>(j) - cy;
-            if (dx * dx + dy * dy <= r2) {
-                image.at(i, j) = 1.0;
-            }
+            image.at(i, j) = std::exp(-(dx * dx + dy * dy) * inv);
         }
     }
     return image;
 }
 
-/** Non-parametric transform for failure-path test. */
 class BareTransform final : public ir::Transform2D {
 public:
     [[nodiscard]] ir::Point2D transformPoint(const ir::Point2D& p) const override { return p; }
@@ -50,7 +48,7 @@ public:
 
 } // namespace
 
-TEST_CASE("ImageRegistrationMethod2D is a concrete Registration2D",
+TEST_CASE("ImageRegistrationMethod2D is concrete Registration2D",
           "[registration][ImageRegistrationMethod2D]") {
     STATIC_REQUIRE(std::is_base_of_v<ir::Registration2D, ir::ImageRegistrationMethod2D>);
     STATIC_REQUIRE(std::is_final_v<ir::ImageRegistrationMethod2D>);
@@ -59,11 +57,11 @@ TEST_CASE("ImageRegistrationMethod2D is a concrete Registration2D",
 
 TEST_CASE("ImageRegistrationMethod2D rejects non-parametric transform",
           "[registration][ImageRegistrationMethod2D]") {
-    const ir::Image2D fixed = makeDisk(16, 16, 8.0, 8.0, 3.0);
+    const ir::Image2D fixed = makeBlob(16, 16, 8.0, 8.0, 2.0);
     const ir::Image2D moving = fixed;
     const ir::MeanSquaresMetric2D metric;
     const ir::ImageResampler2D resampler;
-    const ir::NearestNeighborInterpolator2D interpolator;
+    const ir::LinearInterpolator2D interpolator;
     const ir::RegularStepGradientDescent optimizer{10, 0.1};
     const ir::ImageRegistrationMethod2D method(metric, resampler, interpolator, optimizer);
 
@@ -75,23 +73,23 @@ TEST_CASE("ImageRegistrationMethod2D rejects non-parametric transform",
 
 TEST_CASE("ImageRegistrationMethod2D recovers known Translation2D",
           "[registration][ImageRegistrationMethod2D]") {
-    constexpr int kW = 48;
-    constexpr int kH = 48;
-    constexpr double kRadius = 8.0;
-    constexpr double kShiftX = 5.0;
+    constexpr int kW = 40;
+    constexpr int kH = 40;
+    constexpr double kSigma = 3.0;
+    constexpr double kShiftX = 3.0;
     constexpr double kShiftY = 0.0;
 
-    const ir::Image2D fixed = makeDisk(kW, kH, 18.0, 24.0, kRadius);
-    const ir::Image2D moving = makeDisk(kW, kH, 18.0 + kShiftX, 24.0 + kShiftY, kRadius);
+    const ir::Image2D fixed = makeBlob(kW, kH, 16.0, 20.0, kSigma);
+    const ir::Image2D moving = makeBlob(kW, kH, 16.0 + kShiftX, 20.0 + kShiftY, kSigma);
 
     const ir::MeanSquaresMetric2D metric;
     const ir::ImageResampler2D resampler;
-    const ir::NearestNeighborInterpolator2D interpolator;
-    // Larger step / iterations for discrete NN metric landscape
-    const ir::RegularStepGradientDescent optimizer{80, 0.5, 1e-4, 1e-6, 2.0, 1.1, 0.5, 0.5};
+    const ir::LinearInterpolator2D interpolator;
+    // Finite-diff on image metrics: larger eps and step than pure quadratics
+    const ir::RegularStepGradientDescent optimizer{120, 0.25, 1e-5, 1e-8, 1.0, 1.05, 0.5, 0.35};
 
     const ir::ImageRegistrationMethod2D method(metric, resampler, interpolator, optimizer);
-    ir::Translation2D transform; // start at identity
+    ir::Translation2D transform;
 
     const double mseBefore = metric.evaluate(fixed, moving);
     const ir::RegistrationResult r = method.run(fixed, moving, transform);
@@ -99,20 +97,19 @@ TEST_CASE("ImageRegistrationMethod2D recovers known Translation2D",
     REQUIRE(r.succeeded);
     REQUIRE(r.code == ir::ErrorCode::Ok);
     REQUIRE(r.finalMetric <= mseBefore + 1e-9);
-
-    REQUIRE_THAT(transform.offset().x(), WithinAbs(kShiftX, 1.5));
-    REQUIRE_THAT(transform.offset().y(), WithinAbs(kShiftY, 1.5));
+    REQUIRE_THAT(transform.offset().x(), WithinAbs(kShiftX, 1.25));
+    REQUIRE_THAT(transform.offset().y(), WithinAbs(kShiftY, 1.25));
 }
 
 TEST_CASE("ImageRegistrationMethod2D works through Registration2D base",
           "[registration][ImageRegistrationMethod2D]") {
-    const ir::Image2D fixed = makeDisk(32, 32, 12.0, 16.0, 6.0);
-    const ir::Image2D moving = makeDisk(32, 32, 14.0, 16.0, 6.0);
+    const ir::Image2D fixed = makeBlob(32, 32, 12.0, 16.0, 2.5);
+    const ir::Image2D moving = makeBlob(32, 32, 13.0, 16.0, 2.5);
 
     const ir::MeanSquaresMetric2D metric;
     const ir::ImageResampler2D resampler;
-    const ir::NearestNeighborInterpolator2D interpolator;
-    const ir::RegularStepGradientDescent optimizer{40, 0.4, 1e-4, 1e-6, 2.0, 1.1, 0.5, 0.5};
+    const ir::LinearInterpolator2D interpolator;
+    const ir::RegularStepGradientDescent optimizer{60, 0.2, 1e-5, 1e-8, 1.0, 1.05, 0.5, 0.35};
     const ir::ImageRegistrationMethod2D concrete(metric, resampler, interpolator, optimizer);
     const ir::Registration2D& base = concrete;
 

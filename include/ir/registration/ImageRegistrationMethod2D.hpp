@@ -23,9 +23,9 @@ namespace detail {
  */
 class RegistrationCost2D final : public CostFunction {
 public:
-    RegistrationCost2D(const Image2D& fixed, const Image2D& moving, ParametricTransform2D& transform,
-                       const Metric2D& metric, const Resampler2D& resampler,
-                       const Interpolator2D& interpolator)
+    RegistrationCost2D(const Image2D& fixed, const Image2D& moving,
+                       ParametricTransform2D& transform, const Metric2D& metric,
+                       const Resampler2D& resampler, const Interpolator2D& interpolator)
         : m_fixed(&fixed), m_moving(&moving), m_transform(&transform), m_metric(&metric),
           m_resampler(&resampler), m_interpolator(&interpolator) {}
 
