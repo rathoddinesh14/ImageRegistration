@@ -1,14 +1,9 @@
 # Task: ImageRegistrationMethod2D (concrete pipeline)
 
-**Status**: todo  
+**Status**: done (branch `feature/image-registration-method2d`)  
 **Component**: registration  
-**Priority**: Medium  
-**Depends on**: Registration2D interface, concrete metric/resampler/optimizer
 
-## Goal
-Compose metric + resampler + optimizer + transform into an end-to-end 2D registration runnable from tests/examples.
-
-## Acceptance criteria
-- [ ] Concrete method type
-- [ ] Catch2: recover known Translation2D on synthetic shifted image (within tolerance)
-- [ ] Returns `RegistrationResult`
+## Delivered
+- `ImageRegistrationMethod2D` composing metric + resampler + interpolator + optimizer
+- Internal `RegistrationCost2D` adapter
+- Catch2: recover known Translation2D; reject non-parametric transform
