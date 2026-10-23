@@ -19,6 +19,7 @@ add_executable(ir_tests
   resampler/test_image_resampler2d.cpp
   registration/test_registration_result.cpp
   registration/test_registration2d.cpp
+  registration/test_image_registration_method2d.cpp
   optimizer/test_optimizer.cpp
   optimizer/test_regular_step_gradient_descent.cpp
 )
