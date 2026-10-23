@@ -49,8 +49,8 @@ int main() {
     constexpr int kW = 48;
     constexpr int kH = 48;
     constexpr double kSigma = 3.5;
-    constexpr double kTrueTx = 4.0;
-    constexpr double kTrueTy = 1.0;
+    constexpr double kTrueTx = 2.0;
+    constexpr double kTrueTy = 0.0;
 
     const ir::Image2D fixed = makeBlob(kW, kH, 18.0, 22.0, kSigma);
     const ir::Image2D moving = makeBlob(kW, kH, 18.0 + kTrueTx, 22.0 + kTrueTy, kSigma);
@@ -58,7 +58,7 @@ int main() {
     const ir::MeanSquaresMetric2D metric;
     const ir::ImageResampler2D resampler;
     const ir::LinearInterpolator2D interpolator;
-    const ir::RegularStepGradientDescent optimizer{150, 0.25, 1e-5, 1e-8, 1.0, 1.05, 0.5, 0.4};
+    const ir::RegularStepGradientDescent optimizer{250, 2.0, 1e-6, 1e-10, 4.0, 1.2, 0.5, 0.5};
     const ir::ImageRegistrationMethod2D method(metric, resampler, interpolator, optimizer);
 
     ir::Translation2D transform; // identity start

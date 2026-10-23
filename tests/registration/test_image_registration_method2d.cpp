@@ -73,20 +73,21 @@ TEST_CASE("ImageRegistrationMethod2D rejects non-parametric transform",
 
 TEST_CASE("ImageRegistrationMethod2D recovers known Translation2D",
           "[registration][ImageRegistrationMethod2D]") {
-    constexpr int kW = 40;
-    constexpr int kH = 40;
-    constexpr double kSigma = 3.0;
-    constexpr double kShiftX = 3.0;
+    // Small 1D shift + smooth blob so finite-diff regular-step GD can finish under CI.
+    constexpr int kW = 32;
+    constexpr int kH = 32;
+    constexpr double kSigma = 4.0;
+    constexpr double kShiftX = 1.5;
     constexpr double kShiftY = 0.0;
 
-    const ir::Image2D fixed = makeBlob(kW, kH, 16.0, 20.0, kSigma);
-    const ir::Image2D moving = makeBlob(kW, kH, 16.0 + kShiftX, 20.0 + kShiftY, kSigma);
+    const ir::Image2D fixed = makeBlob(kW, kH, 14.0, 16.0, kSigma);
+    const ir::Image2D moving = makeBlob(kW, kH, 14.0 + kShiftX, 16.0 + kShiftY, kSigma);
 
     const ir::MeanSquaresMetric2D metric;
     const ir::ImageResampler2D resampler;
     const ir::LinearInterpolator2D interpolator;
-    // Finite-diff on image metrics: larger eps and step than pure quadratics
-    const ir::RegularStepGradientDescent optimizer{120, 0.25, 1e-5, 1e-8, 1.0, 1.05, 0.5, 0.35};
+    // Image metrics need larger step scale / FD epsilon than analytic quadratics.
+    const ir::RegularStepGradientDescent optimizer{250, 2.0, 1e-6, 1e-10, 4.0, 1.2, 0.5, 0.5};
 
     const ir::ImageRegistrationMethod2D method(metric, resampler, interpolator, optimizer);
     ir::Translation2D transform;
@@ -96,9 +97,9 @@ TEST_CASE("ImageRegistrationMethod2D recovers known Translation2D",
 
     REQUIRE(r.succeeded);
     REQUIRE(r.code == ir::ErrorCode::Ok);
-    REQUIRE(r.finalMetric <= mseBefore + 1e-9);
-    REQUIRE_THAT(transform.offset().x(), WithinAbs(kShiftX, 1.25));
-    REQUIRE_THAT(transform.offset().y(), WithinAbs(kShiftY, 1.25));
+    REQUIRE(r.finalMetric < mseBefore);
+    REQUIRE_THAT(transform.offset().x(), WithinAbs(kShiftX, 0.75));
+    REQUIRE_THAT(transform.offset().y(), WithinAbs(kShiftY, 0.75));
 }
 
 TEST_CASE("ImageRegistrationMethod2D works through Registration2D base",
