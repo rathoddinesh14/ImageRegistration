@@ -3,7 +3,6 @@
 #include <ir/transform/Rigid2D.hpp>
 #include <ir/transform/Transform2D.hpp>
 #include <memory>
-#include <numbers>
 #include <type_traits>
 
 #include <catch2/catch_test_macros.hpp>
@@ -14,6 +13,7 @@ using Catch::Matchers::WithinAbs;
 namespace {
 
 constexpr double kTol = 1e-12;
+constexpr double kPi = 3.141592653589793238462643383279502884;
 
 } // namespace
 
@@ -37,7 +37,7 @@ TEST_CASE("Rigid2D pure translation matches offset", "[transform][Rigid2D]") {
 }
 
 TEST_CASE("Rigid2D pure rotation by pi/2 about origin", "[transform][Rigid2D]") {
-    const double halfPi = std::numbers::pi_v<double> / 2.0;
+    const double halfPi = kPi / 2.0;
     const ir::Rigid2D rigid{halfPi, ir::Point2D{0.0, 0.0}};
 
     // (1, 0) -> (0, 1)
@@ -52,7 +52,7 @@ TEST_CASE("Rigid2D pure rotation by pi/2 about origin", "[transform][Rigid2D]") 
 }
 
 TEST_CASE("Rigid2D rotate then translate", "[transform][Rigid2D]") {
-    const double halfPi = std::numbers::pi_v<double> / 2.0;
+    const double halfPi = kPi / 2.0;
     const ir::Rigid2D rigid{halfPi, ir::Point2D{10.0, 20.0}};
 
     // (1, 0) -> (0, 1) + (10, 20) = (10, 21)
