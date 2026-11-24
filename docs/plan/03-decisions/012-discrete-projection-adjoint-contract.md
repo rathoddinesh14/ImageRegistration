@@ -15,13 +15,13 @@ The initial discrete model uses ray–pixel intersection lengths and piecewise-c
 
 Specify and test a matched discrete operator pair:
 
-- Forward projection is `A : X → Y`, mapping image samples to projection samples.
-- Under the initial Euclidean inner products, the mathematical adjoint is `A* = Aᵀ`.
-- The pair must satisfy `<Ax,y>_Y = <x,A*y>_X` up to the documented floating-point tolerance.
+- Forward projection is $A : X \to Y$, mapping image samples to projection samples.
+- Under the initial Euclidean inner products, the mathematical adjoint is $A^* = A^\mathsf{T}$.
+- The pair must satisfy $\langle Ax, y \rangle_Y = \langle x, A^*y \rangle_X$ up to the documented floating-point tolerance.
 - Pixel intersection coefficients represent physical path lengths for the selected discretization.
 - Geometry, shape, ordering, boundary behavior, and spacing conventions must be identical and explicit for both operators.
 - Do not silently insert detector spacing, pixel-area, angular quadrature, or normalization weights into the Euclidean inner products.
-- If weighted inner products are introduced later, document the weight operators and corresponding adjoint `A* = W_X⁻¹ Aᵀ W_Y` as a distinct contract.
+- If weighted inner products are introduced later, document the weight operators and the corresponding adjoint $A^* = W_X^{-1} A^\mathsf{T} W_Y$ as a distinct contract.
 - Name an operation `Adjoint` only if it satisfies the declared identity. FBP backprojection remains a separate reconstruction operation and may include filtering, quadrature, interpolation, or normalization.
 
 ## Alternatives considered
